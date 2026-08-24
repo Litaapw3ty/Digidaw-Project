@@ -1,0 +1,42 @@
+<?php
+// CONTOH CUPLIKAN yang perlu MENGGANTI route /dashboard bawaan Breeze
+// di routes/web.php project kamu.
+//
+// CARI baris yang mirip ini (bawaan Breeze), lalu HAPUS:
+//   Route::get('/dashboard', function () {
+//       return view('dashboard');
+//   })->middleware(['auth', 'verified'])->name('dashboard');
+//
+// GANTI dengan kode di bawah ini. Nama route-nya tetap 'dashboard'
+// (sengaja disamakan) karena LoginController & RegisteredUserController
+// Breeze sudah redirect ke route('dashboard') -- jadi kita cuma ganti
+// ISI-nya jadi "lempar ke dashboard sesuai role", bukan bikin nama baru.
+
+use Illuminate\Support\Facades\Route;
+
+Route::middleware('auth')->get('/dashboard', function () {
+    $role = auth()->user()->role->nama_role;
+
+    return match ($role) {
+        'ADMIN' => redirect()->route('admin.dashboard'),
+        'ASESOR' => redirect()->route('asesor.dashboard'),
+        'USER' => redirect()->route('user.dashboard'),
+        default => abort(403),
+    };
+})->name('dashboard');
+
+// --- Grup route per role ---
+Route::middleware(['auth', 'role:ADMIN'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(base_path('routes/admin.php'));
+
+Route::middleware(['auth', 'role:ASESOR'])
+    ->prefix('asesor')
+    ->name('asesor.')
+    ->group(base_path('routes/asesor.php'));
+
+Route::middleware(['auth', 'role:USER'])
+    ->prefix('evaluasi')
+    ->name('user.')
+    ->group(base_path('routes/user.php'));
