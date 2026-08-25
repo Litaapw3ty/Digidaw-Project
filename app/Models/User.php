@@ -15,7 +15,7 @@ class User extends Authenticatable
 
     protected $fillable = [
         'id_role', 'id_instansi', 'name', 'username', 'email',
-        'password', 'no_hp', 'status', 'last_login',
+        'password', 'no_hp', 'nip', 'status', 'last_login',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -43,7 +43,8 @@ class User extends Authenticatable
     {
         return $this->hasOne(Asesor::class, 'id_user', 'id_user');
     }
-    //helper untuk memeriksa role user
+
+    // --- Helper role check (dipakai di middleware/policy) ---
     public function isAdmin(): bool
     {
         return $this->role?->nama_role === 'ADMIN';
