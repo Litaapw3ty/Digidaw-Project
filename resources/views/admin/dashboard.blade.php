@@ -5,9 +5,9 @@
         </h2>
     </x-slot>
 
-    @push('sidebar')
+    @section('sidebar')
         @include('layouts.sidebar.sidebar-admin')
-    @endpush
+    @endsection
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">

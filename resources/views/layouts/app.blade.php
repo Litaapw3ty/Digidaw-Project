@@ -50,23 +50,20 @@
                     <nav class="mt-2">
                         <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
                             
-                            <!-- Menu Dashboard (Umum) -->
-                            <li class="nav-item">
-                                <a href="{{ url('/dashboard') }}" class="nav-link">
-                                    <i class="nav-icon bi bi-speedometer"></i>
-                                    <p>Dashboard</p>
-                                </a>
-                            </li>
 
                             <!-- PEMANGGILAN SIDEBAR BERDASARKAN ROLE -->
-                            @if(auth()->check())
-                                @if(auth()->user()->role == 'admin')
+                           @if(auth()->check())
+
+                                @if(auth()->user()->role->nama_role == 'ADMIN')
                                     @include('layouts.sidebar.sidebar-admin')
-                                @elseif(auth()->user()->role == 'asesor')
+
+                                @elseif(auth()->user()->role->nama_role == 'ASESOR')
                                     @include('layouts.sidebar.sidebar-asesor')
-                                @elseif(auth()->user()->role == 'user')
+
+                                @elseif(auth()->user()->role->nama_role == 'USER')
                                     @include('layouts.sidebar.sidebar-user')
                                 @endif
+
                             @endif
 
                         </ul>

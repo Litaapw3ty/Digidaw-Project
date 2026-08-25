@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Route;
 // dari routes/web.php, jadi di sini cukup nulis path-nya aja (tanpa /admin di depan)
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-Route::get('/dashboard', function () {
-        return view('dashboard'); // Sesuaikan dengan file view dashboard kamu
-    })->name('dashboard');
+// Route::get('/dashboard', function () {
+//         return view('dashboard'); // Sesuaikan dengan file view dashboard kamu
+//     })->name('dashboard');
 
 // Nanti tambah di sini kalau bikin fitur baru, contoh:
 // Route::get('/users', [UserController::class, 'index'])->name('users.index');
