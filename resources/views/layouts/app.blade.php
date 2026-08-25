@@ -11,26 +11,94 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-        <!-- Scripts -->
+        <!-- Bootstrap Icons -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+        <!-- Scripts & CSS (Vite / AdminLTE) -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
+    <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+        <div class="app-wrapper">
+            
+            <!-- Navbar Atas (Opsional, atau bisa pakai bawaan AdminLTE) -->
+            <nav class="app-header navbar navbar-expand bg-body">
+                <div class="container-fluid">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button"><i class="bi bi-list"></i></a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <span class="nav-link">Halo, {{ auth()->user()->name ?? 'User' }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
 
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
+            <!-- SIDEBAR UTAMA (Dinamis Berdasarkan Role) -->
+            <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+                <!-- Brand Logo -->
+                <div class="sidebar-brand">
+                    <a href="{{ url('/dashboard') }}" class="brand-link">
+                        <span class="brand-text fw-light">Digidaw Project</span>
+                    </a>
+                </div>
+
+                <!-- Sidebar Wrapper -->
+                <div class="sidebar-wrapper">
+                    <nav class="mt-2">
+                        <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
+                            
+                            <!-- Menu Dashboard (Umum) -->
+                            <li class="nav-item">
+                                <a href="{{ url('/dashboard') }}" class="nav-link">
+                                    <i class="nav-icon bi bi-speedometer"></i>
+                                    <p>Dashboard</p>
+                                </a>
+                            </li>
+
+                            <!-- PEMANGGILAN SIDEBAR BERDASARKAN ROLE -->
+                            @if(auth()->check())
+                                @if(auth()->user()->role == 'admin')
+                                    @include('layouts.sidebar.sidebar-admin')
+                                @elseif(auth()->user()->role == 'asesor')
+                                    @include('layouts.sidebar.sidebar-asesor')
+                                @elseif(auth()->user()->role == 'user')
+                                    @include('layouts.sidebar.sidebar-user')
+                                @endif
+                            @endif
+
+                        </ul>
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- KONTEN UTAMA HALAMAN -->
+            <main class="app-main">
+                <!-- Page Heading (Opsional) -->
+                @isset($header)
+                    <div class="app-content-header">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <h3 class="mb-0">{{ $header }}</h3>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </header>
-            @endisset
+                @endisset
 
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
+                <!-- Isi Konten Utama dari View Lain -->
+                <div class="app-content">
+                    <div class="container-fluid">
+                        {{ $slot }}
+                    </div>
+                </div>
             </main>
+
         </div>
+
+        <!-- AdminLTE v4 JS (Pastikan sudah di-import lewat Vite atau CDN tambahan jika diperlukan) -->
     </body>
 </html>
