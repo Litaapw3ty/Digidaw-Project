@@ -2,8 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ProfileTest extends TestCase
@@ -40,7 +43,6 @@ class ProfileTest extends TestCase
 
         $this->assertSame('Test User', $user->name);
         $this->assertSame('test@example.com', $user->email);
-        $this->assertNull($user->email_verified_at);
     }
 
     public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged(): void
@@ -58,7 +60,43 @@ class ProfileTest extends TestCase
             ->assertSessionHasNoErrors()
             ->assertRedirect('/profile');
 
-        $this->assertNotNull($user->refresh()->email_verified_at);
+        $this->assertSame($user->email, $user->refresh()->email);
+    }
+
+    public function test_profile_photo_can_be_uploaded_and_persisted_for_asesor_profile(): void
+    {
+        Storage::fake('public');
+
+        $role = Role::query()->firstOrCreate([
+            'nama_role' => 'ASESOR',
+        ], [
+            'deskripsi' => 'Asesor',
+        ]);
+
+        $user = User::factory()->create([
+            'id_role' => $role->id_role,
+            'name' => 'Asesor Demo',
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->from('/asesor/edit_asesor')
+            ->put('/asesor/edit_asesor', [
+                'name' => 'Asesor Demo Baru',
+                'email' => 'asesorbaru@example.com',
+                'avatar' => UploadedFile::fake()->image('avatar.jpg', 300, 300),
+            ]);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/asesor/profil');
+
+        $user->refresh();
+
+        $this->assertSame('Asesor Demo Baru', $user->name);
+        $this->assertSame('asesorbaru@example.com', $user->email);
+        $this->assertNotNull($user->profile_photo_path);
+        $this->assertFileExists(public_path($user->profile_photo_path));
     }
 
     public function test_user_can_delete_their_account(): void
