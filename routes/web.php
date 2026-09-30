@@ -3,9 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', function () { return view('home');})->name('home');
 
 Route::middleware('auth')->get('/dashboard', function () {
     $role = auth()->user()->role->nama_role;
@@ -30,7 +28,7 @@ Route::middleware(['auth', 'role:ASESOR'])
     ->group(base_path('routes/asesor.php'));
 
 Route::middleware(['auth', 'role:USER'])
-    ->prefix('evaluasi')
+    ->prefix('user')
     ->name('user.')
     ->group(base_path('routes/user.php'));
 
