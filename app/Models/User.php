@@ -14,11 +14,11 @@ class User extends Authenticatable
     protected $primaryKey = 'id_user';
     public $timestamps = true;
 
-    protected $fillable = [
-        'id_role', 'id_instansi', 'name', 'username', 'email',
-        'password', 'no_hp', 'nip', 'status', 'last_login',
-        'foto_profil',
-    ];
+   protected $fillable = [
+    'id_role', 'id_instansi', 'name', 'username', 'email',
+    'password', 'no_hp', 'nip', 'status', 'last_login',
+    'foto_profil',
+];
 
     protected $hidden = ['password', 'remember_token'];
 
