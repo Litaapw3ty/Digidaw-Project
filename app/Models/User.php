@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use HasFactory, Notifiable;
 
     protected $table = 'users';
     protected $primaryKey = 'id_user';
@@ -16,6 +17,7 @@ class User extends Authenticatable
     protected $fillable = [
         'id_role', 'id_instansi', 'name', 'username', 'email',
         'password', 'no_hp', 'nip', 'status', 'last_login',
+        'foto_profil',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -26,6 +28,19 @@ class User extends Authenticatable
             'last_login' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    protected $appends = ['profile_photo_url'];
+
+    public function getProfilePhotoUrlAttribute(): string
+    {
+        $path = $this->foto_profil ?? null;
+
+        if (! empty($path) && file_exists(public_path($path))) {
+            return asset($path);
+        }
+
+        return asset('asesor_img/default-profile.svg');
     }
 
     // --- Relasi ---
