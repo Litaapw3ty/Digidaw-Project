@@ -27,4 +27,11 @@ class Instansi extends Model
     {
         return $this->hasMany(Evaluasi::class, 'id_instansi', 'id_instansi');
     }
+
+    public function evaluasiTerbaru()
+    {
+        // Mengambil satu evaluasi paling baru milik instansi.
+        return $this->hasOne(Evaluasi::class, 'id_instansi', 'id_instansi')
+            ->latestOfMany('id_evaluasi');
+    }
 }
