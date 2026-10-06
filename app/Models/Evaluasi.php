@@ -10,7 +10,7 @@ class Evaluasi extends Model
     protected $primaryKey = 'id_evaluasi';
     protected $fillable = [
         'id_instansi', 'id_asesor', 'tahun', 'status',
-        'indeks_akhir', 'predikat', 'tanggal_mulai', 'tanggal_selesai',
+        'indeks_akhir', 'predikat', 'tanggal_mulai', 'tanggal_selesai', 
     ];
 
     public function instansi()

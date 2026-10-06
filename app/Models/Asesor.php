@@ -12,6 +12,9 @@ class Asesor extends Model
         'id_user', 'id_instansi', 'nip', 'jabatan', 'keahlian',
         'unit_kerja', 'status', 'wilayah',
     ];
+    protected $casts = [
+    'keahlian' => 'array',
+    ];
 
     public function user()
     {
@@ -38,4 +41,14 @@ class Asesor extends Model
     {
         return $this->hasMany(VerifikasiBukti::class, 'id_asesor', 'id_asesor');
     }
+    /** Wilayah yang menjadi penugasan asesor. Satu asesor bisa memiliki banyak wilayah.*/
+    public function wilayahPenugasan()
+    {
+        return $this->belongsToMany(
+            Wilayah::class,
+            'asesor_wilayah',
+            'id_asesor',
+            'id_wilayah'
+        );
+    }   
 }
