@@ -538,27 +538,32 @@
                         </div>
 
                         {{-- REMEMBER / HOTLINE --}}
-                        <div class="mb-6 flex w-full items-center justify-between gap-4">
-                            <label for="remember" class="remember-label flex cursor-pointer items-center gap-2.5">
-                                <span class="relative flex h-5 w-5 shrink-0 items-center justify-center">
-                                    {{-- Tambahkan value="on" agar diterima backend Laravel --}}
-                                    <input
-                                        id="remember"
-                                        type="checkbox"
-                                        name="remember"
-                                        value="on"
-                                        class="peer absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                                    >
-                                    <span class="remember-box pointer-events-none absolute inset-0 rounded-[5px] border transition-colors peer-checked:border-[#0D9488] peer-checked:bg-[#0D9488]"></span>
-                                    <i class="pointer-events-none relative z-10 hidden text-[11px] text-white peer-checked:block fa-solid fa-check"></i>
-                                </span>
-                                <span>Ingat Saya</span>
-                            </label>
+                        {{-- REMEMBER / HOTLINE --}}
+<div class="mb-6 flex w-full items-center justify-between gap-4">
 
-                            <a href="https://api.whatsapp.com/send/?phone=6289696961908&text&type=phone_number&app_absent=0" class="hotline-link no-underline transition-colors hover:text-[#0D9488]">
-                                Hubungi hotline!
-                            </a>
-                        </div>
+    <label
+        for="remember"
+        class="remember-label flex cursor-pointer items-center gap-2.5"
+    >
+        <input
+            id="remember"
+            type="checkbox"
+            name="remember"
+            value="on"
+            class="h-5 w-5 cursor-pointer rounded border-gray-300 text-[#0D9488] focus:ring-[#0D9488]"
+        >
+
+        <span>Ingat Saya</span>
+    </label>
+
+    <a
+        href="https://api.whatsapp.com/send/?phone=6289696961908&text&type=phone_number&app_absent=0"
+        class="hotline-link no-underline transition-colors hover:text-[#0D9488]"
+    >
+        Hubungi hotline!
+    </a>
+
+</div>
 
                         {{-- SUBMIT --}}
                         <button

@@ -6,10 +6,7 @@
     <div class="mb-6">
         {{-- BREADCRUMB --}}
         <div class="mb-5 flex items-center gap-3 text-sm">
-            <a
-                href="{{ route('user.penilaian') }}"
-                class="font-semibold text-[#0f246b] hover:underline dark:text-blue-300"
-            >
+            <a href="{{ route('user.penilaian') }}" class="font-semibold text-[#0f246b] hover:underline dark:text-blue-300">
                 Penilaian
             </a>
 
@@ -17,10 +14,7 @@
                 ›
             </span>
 
-            <a
-                href="{{ route('user.penilaian') }}"
-                class="font-semibold text-[#0f246b] hover:underline dark:text-blue-300"
-            >
+            <a href="{{ route('user.penilaian') }}" class="font-semibold text-[#0f246b] hover:underline dark:text-blue-300">
                 Penilaian Mandiri
             </a>
 
@@ -31,7 +25,6 @@
             <span class="text-gray-500 dark:text-gray-300">
                 Indikator Penilaian Mandiri
             </span>
-
         </div>
 
 
@@ -442,602 +435,216 @@
                      TABLE
                 ================================================== --}}
 
-                <div class="overflow-x-auto px-6">
-                    <table class="w-full border-collapse">
-                        <thead class="bg-slate-700">
+                <div class="overflow-x-auto px-6 pb-6">
+                    <table class="w-full border-collapse rounded-t-lg overflow-hidden shadow-sm">
+                        
+                        {{-- HEADER TABEL --}}
+                        <thead class="bg-gray-100 dark:bg-slate-700">
                             <tr>
-                                <th class="rounded-tl-md border-b-2 border-teal-400
-                                        px-4 py-4 text-xs font-bold uppercase
-                                        tracking-wider text-white">
+                                <th class="border-b-[3px] border-[#12a89d] px-4 py-4 text-center text-xs font-bold uppercase tracking-wider text-gray-700 dark:border-[#0f8f88] dark:text-white">
                                     No
                                 </th>
 
-                                <th class="border-b-2 border-teal-400
-                                        px-4 py-4 text-xs font-bold uppercase
-                                        tracking-wider text-white">
+                                <th class="border-b-[3px] border-[#12a89d] px-4 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-700 dark:border-[#0f8f88] dark:text-white">
                                     Data Dukung
                                 </th>
 
-                                <th class="border-b-2 border-teal-400
-                                        px-4 py-4 text-xs font-bold uppercase
-                                        tracking-wider text-white">
+                                <th class="border-b-[3px] border-[#12a89d] px-4 py-4 text-center text-xs font-bold uppercase tracking-wider text-gray-700 dark:border-[#0f8f88] dark:text-white">
                                     Template Dokumen
                                 </th>
 
-                                <th class="border-b-2 border-teal-400
-                                        px-4 py-4 text-xs font-bold uppercase
-                                        tracking-wider text-white">
+                                <th class="border-b-[3px] border-[#12a89d] px-4 py-4 text-center text-xs font-bold uppercase tracking-wider text-gray-700 dark:border-[#0f8f88] dark:text-white">
                                     Panduan
                                 </th>
 
-                                <th class="border-b-2 border-teal-400
-                                        px-4 py-4 text-xs font-bold uppercase
-                                        tracking-wider text-white">
+                                <th class="border-b-[3px] border-[#12a89d] px-4 py-4 text-center text-xs font-bold uppercase tracking-wider text-gray-700 dark:border-[#0f8f88] dark:text-white">
                                     Status
                                 </th>
 
-                                <th class="border-b-2 border-teal-400
-                                        px-4 py-4 text-xs font-bold uppercase
-                                        tracking-wider text-white">
+                                <th class="border-b-[3px] border-[#12a89d] px-4 py-4 text-center text-xs font-bold uppercase tracking-wider text-gray-700 dark:border-[#0f8f88] dark:text-white">
                                     Value
                                 </th>
 
-                                <th class="rounded-tr-md border-b-2 border-teal-400
-                                        px-4 py-4 text-xs font-bold uppercase
-                                        tracking-wider text-white">
+                                <th class="border-b-[3px] border-[#12a89d] px-4 py-4 text-center text-xs font-bold uppercase tracking-wider text-gray-700 dark:border-[#0f8f88] dark:text-white">
                                     Aksi
                                 </th>
                             </tr>
                         </thead>
 
-
-                        <tbody>
+                        {{-- BODY TABEL --}}
+                        <tbody class="bg-white dark:bg-slate-900/80">
 
                             @forelse($items as $item)
 
                                 @php
+                                    $sudahUpload = in_array(
+                                        $item->status_data_dukung,
+                                        ['TERKIRIM', 'DIVERIFIKASI', 'PERLU_PERBAIKAN'],
+                                        true
+                                    ) && $item->dokumen->isNotEmpty();
 
-                                    /*
-                                    |--------------------------------------------------------------------------
-                                    | CEK SUDAH UPLOAD
-                                    |--------------------------------------------------------------------------
-                                    |
-                                    | Upload dianggap sudah dilakukan jika:
-                                    |
-                                    | 1. Status evaluasi_data_dukung sudah TERKIRIM /
-                                    |    DIVERIFIKASI / PERLU_PERBAIKAN
-                                    |
-                                    | 2. Ada dokumen aktif
-                                    |
-                                    */
-
-                                    $sudahUpload =
-                                        in_array(
-                                            $item->status_data_dukung,
-                                            [
-                                                'TERKIRIM',
-                                                'DIVERIFIKASI',
-                                                'PERLU_PERBAIKAN',
-                                            ],
-                                            true
-                                        )
-                                        &&
-                                        $item->dokumen->isNotEmpty();
-
-
-                                    /*
-                                    |--------------------------------------------------------------------------
-                                    | TEMPLATE
-                                    |--------------------------------------------------------------------------
-                                    */
-
-                                    $template =
-                                        $panduan
-                                            ->where(
-                                                'tipe',
-                                                'TEMPLATE'
-                                            )
-                                            ->first();
-
+                                    $template = $panduan->where('tipe', 'TEMPLATE')->first();
                                 @endphp
 
+                                <tr class="border-b border-gray-200 transition hover:bg-gray-50 dark:border-slate-700/80 dark:hover:bg-slate-800/70">
 
-                                <tr
-                                    class="border-b border-gray-200 last:border-b-0 dark:border-gray-700"
-                                >
-
-                                    {{-- =================================================
-                                         NO
-                                    ================================================== --}}
-
-                                    <td
-                                        class="border-r border-gray-200 px-3 py-5 text-center text-xs text-gray-600 dark:border-gray-700 dark:text-gray-300"
-                                    >
-
-                                        {{ $item->nomor }}
-
+                                    {{-- NO --}}
+                                    <td class="border-r border-gray-200 px-3 py-5 text-center text-xs text-gray-600 dark:border-slate-700/50 dark:text-gray-300">
+                                        {{ $loop->iteration }}
                                     </td>
 
-
-                                    {{-- =================================================
-                                         DATA DUKUNG
-                                    ================================================== --}}
-
-                                    <td
-                                        class="border-r border-gray-200 px-4 py-5 dark:border-gray-700"
-                                    >
-
-                                        <div
-                                            class="text-xs leading-relaxed text-gray-700 dark:text-gray-300"
-                                        >
-
+                                    {{-- DATA DUKUNG --}}
+                                    <td class="border-r border-gray-200 px-4 py-5 dark:border-slate-700/50">
+                                        <div class="text-xs leading-relaxed text-gray-700 dark:text-gray-300">
                                             {{ $item->nama_data_dukung }}
-
                                         </div>
-
                                     </td>
 
-
-                                    {{-- =================================================
-                                         TEMPLATE
-                                    ================================================== --}}
-
-                                    <td
-                                        class="border-r border-gray-200 px-4 py-5 dark:border-gray-700"
-                                    >
-
+                                    {{-- TEMPLATE --}}
+                                    <td class="border-r border-gray-200 px-4 py-5 dark:border-slate-700/50">
                                         @if($template)
-
-                                            <a
-                                                href="{{ asset('storage/' . $template->file_path) }}"
-                                                target="_blank"
-                                                class="flex items-start gap-2 text-xs font-semibold text-gray-700 hover:text-[#159b99] dark:text-gray-300"
-                                            >
-
-                                                <svg
-                                                    class="mt-0.5 h-5 w-5 shrink-0 text-gray-400"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
-                                                    />
-
-                                                    <polyline
-                                                        points="14 2 14 8 20 8"
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                    />
-
+                                            <a href="{{ asset('storage/' . $template->file_path) }}" target="_blank" class="flex items-start justify-center gap-2 text-xs font-semibold text-gray-700 hover:text-[#159b99] dark:text-gray-300">
+                                                <svg class="mt-0.5 h-5 w-5 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                                                    <polyline points="14 2 14 8 20 8" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
                                                 </svg>
-
-
-                                                <span class="min-w-0">
-
+                                                <span class="min-w-0 text-left">
                                                     <span class="block break-words">
-
-                                                        {{ $template->judul
-                                                            ?? $template->nama
-                                                            ?? 'Template Dokumen'
-                                                        }}
-
+                                                        {{ $template->judul ?? $template->nama ?? 'Template Dokumen' }}
                                                     </span>
-
-
-                                                    <span
-                                                        class="mt-0.5 block text-[10px] font-normal text-gray-400"
-                                                    >
-                                                        DOCX
-                                                    </span>
-
+                                                    <span class="mt-0.5 block text-[10px] font-normal text-gray-400">DOCX</span>
                                                 </span>
-
                                             </a>
-
                                         @else
-
-                                            <span class="text-xs text-gray-400">
-                                                -
-                                            </span>
-
+                                            <div class="text-center text-xs text-gray-400 dark:text-gray-500">-</div>
                                         @endif
-
                                     </td>
 
-
-                                    {{-- =================================================
-                                         PANDUAN
-                                    ================================================== --}}
-
-                                    <td
-                                        class="border-r border-gray-200 px-3 py-5 text-center dark:border-gray-700"
-                                    >
-
+                                    {{-- PANDUAN --}}
+                                    <td class="border-r border-gray-200 px-3 py-5 text-center dark:border-slate-700/50">
                                         @if($panduanPenilaian)
-
-                                            <button
-                                                type="button"
-                                                onclick="openGuideModal()"
-                                                class="inline-flex items-center gap-1 rounded-md border border-[#d9eeee] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#159b99] transition hover:bg-[#eafafa]"
-                                            >
-
-                                                <svg
-                                                    class="h-3.5 w-3.5"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"
-                                                    />
-
+                                            <button type="button" onclick="openGuideModal()" class="inline-flex items-center gap-1 rounded-md border border-[#d9eeee] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#159b99] transition hover:bg-[#eafafa] dark:border-teal-900 dark:bg-slate-800 dark:hover:bg-teal-950">
+                                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" />
                                                 </svg>
-
                                                 Panduan
-
                                             </button>
-
                                         @else
-
-                                            <span class="text-xs text-gray-400">
-                                                -
-                                            </span>
-
+                                            <span class="text-xs text-gray-400 dark:text-gray-500">-</span>
                                         @endif
-
                                     </td>
 
-
-                                    {{-- =================================================
-                                         STATUS
-                                    ================================================== --}}
-
-                                    <td
-                                        class="border-r border-gray-200 px-3 py-5 text-center dark:border-gray-700"
-                                    >
-
+                                    {{-- STATUS --}}
+                                    <td class="border-r border-gray-200 px-3 py-5 text-center dark:border-slate-700/50">
                                         @switch($item->status_data_dukung)
-
                                             @case('DIVERIFIKASI')
-
-                                                <span
-                                                    class="inline-flex rounded-md bg-[#d9f7df] px-2 py-1 text-[10px] font-semibold text-green-700"
-                                                >
+                                                <span class="inline-flex rounded-md bg-[#d9f7df] px-2 py-1 text-[10px] font-semibold text-green-700 dark:bg-green-900/40 dark:text-green-400 border border-transparent dark:border-green-800">
                                                     Terverifikasi
                                                 </span>
-
                                                 @break
-
-
                                             @case('PERLU_PERBAIKAN')
-
-                                                <span
-                                                    class="inline-flex rounded-md bg-[#ffe1e1] px-2 py-1 text-[10px] font-semibold text-red-600"
-                                                >
+                                                <span class="inline-flex rounded-md bg-[#ffe1e1] px-2 py-1 text-[10px] font-semibold text-red-600 dark:bg-red-900/40 dark:text-red-400 border border-transparent dark:border-red-800">
                                                     Perlu Diperbaiki
                                                 </span>
-
                                                 @break
-
-
                                             @case('TERKIRIM')
-
-                                                <span
-                                                    class="inline-flex rounded-md bg-[#dcecff] px-2 py-1 text-[10px] font-semibold text-blue-600"
-                                                >
+                                                <span class="inline-flex rounded-md bg-[#dcecff] px-2 py-1 text-[10px] font-semibold text-blue-600 dark:bg-blue-900/40 dark:text-blue-400 border border-transparent dark:border-blue-800">
                                                     Sudah Diupload
                                                 </span>
-
                                                 @break
-
-
                                             @default
-
-                                                <span
-                                                    class="inline-flex rounded-md bg-[#ffdfe1] px-2 py-1 text-[10px] font-semibold text-red-600"
-                                                >
+                                                <span class="inline-flex rounded-md bg-[#ffdfe1] px-2 py-1 text-[10px] font-semibold text-red-600 dark:bg-red-900/40 dark:text-red-400 border border-transparent dark:border-red-800">
                                                     Belum<br>Diupload
                                                 </span>
-
                                         @endswitch
-
                                     </td>
 
-
-                                    {{-- =================================================
-                                         VALUE
-                                    ================================================== --}}
-
-                                    <td
-                                        class="border-r border-gray-200 px-3 py-5 text-center text-xs text-gray-700 dark:border-gray-700 dark:text-gray-300"
-                                    >
-
-                                        {{
-                                            rtrim(
-                                                rtrim(
-                                                    number_format(
-                                                        (float) ($item->value ?? 0),
-                                                        2,
-                                                        '.',
-                                                        ''
-                                                    ),
-                                                    '0'
-                                                ),
-                                                '.'
-                                            )
-                                        }}
-
+                                    {{-- VALUE --}}
+                                    <td class="border-r border-gray-200 px-3 py-5 text-center text-xs text-gray-700 dark:border-slate-700/50 dark:text-gray-300">
+                                        {{ rtrim(rtrim(number_format((float) ($item->value ?? 0), 2, '.', ''), '0'), '.') }}
                                     </td>
 
-
-                                    {{-- =================================================
-                                         AKSI
-                                         
-                                         BELUM UPLOAD:
-                                         [ Upload ] [ Edit ]
-
-                                         SUDAH UPLOAD:
-                                         [ Detail ] [ Edit ]
-                                    ================================================== --}}
-
-                                    <td
-                                        class="px-3 py-5 text-center"
-                                    >
-
-                                        <div
-                                            class="flex items-center justify-center gap-1"
-                                        >
-
-                                            {{-- =================================================
-                                                 TOMBOL 1
-                                                 UPLOAD / DETAIL
-                                            ================================================== --}}
-
+                                    {{-- AKSI --}}
+                                    <td class="px-3 py-5 text-center">
+                                        <div class="flex items-center justify-center gap-1">
                                             @if($sudahUpload)
-
-                                                {{-- DETAIL --}}
-                                                <button
-                                                    type="button"
-                                                    onclick="openDocumentDetail({{ $item->id_data_dukung }})"
-                                                    class="inline-flex items-center gap-1 rounded-md bg-[#12a89d] px-2.5 py-1.5 text-[10px] font-bold text-white shadow-sm transition hover:bg-[#0f8f88]"
-                                                >
-
-                                                    <svg
-                                                        class="h-3.5 w-3.5"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        viewBox="0 0 24 24"
-                                                    >
-
-                                                        <path
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7z"
-                                                        />
-
-                                                        <circle
-                                                            cx="12"
-                                                            cy="12"
-                                                            r="3"
-                                                            stroke-width="2"
-                                                        />
-
+                                                <button type="button" onclick="openDocumentDetail({{ $item->id_data_dukung }})" class="inline-flex items-center gap-1 rounded-md bg-[#12a89d] px-2.5 py-1.5 text-[10px] font-bold text-white shadow-sm transition hover:bg-[#0f8f88] dark:hover:bg-[#12a89d]/80">
+                                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7z" />
+                                                        <circle cx="12" cy="12" r="3" stroke-width="2" />
                                                     </svg>
-
                                                     Detail
-
                                                 </button>
-
                                             @else
-
-                                                {{-- UPLOAD --}}
-                                                <button
-                                                    type="button"
-                                                    onclick="openUploadModal({{ $item->id_data_dukung }})"
-                                                    class="inline-flex items-center gap-1 rounded-md bg-[#12a89d] px-2.5 py-1.5 text-[10px] font-bold text-white shadow-sm transition hover:bg-[#0f8f88]"
-                                                >
-
-                                                    <svg
-                                                        class="h-3.5 w-3.5"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        viewBox="0 0 24 24"
-                                                    >
-
-                                                        <path
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-                                                        />
-
+                                                <button type="button" onclick="openUploadModal({{ $item->id_data_dukung }})" class="inline-flex items-center gap-1 rounded-md bg-[#12a89d] px-2.5 py-1.5 text-[10px] font-bold text-white shadow-sm transition hover:bg-[#0f8f88] dark:hover:bg-[#12a89d]/80">
+                                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                                     </svg>
-
                                                     Upload
-
                                                 </button>
-
                                             @endif
 
-
-                                            {{-- =================================================
-                                                 TOMBOL 2
-                                                 EDIT — SELALU ADA
-                                            ================================================== --}}
-
-                                            <button
-                                                type="button"
-                                                onclick="openEditModal({{ $item->id_data_dukung }})"
-                                                class="inline-flex items-center gap-1 rounded-md bg-[#f5bd18] px-2.5 py-1.5 text-[10px] font-bold text-white shadow-sm transition hover:bg-[#dfa900]"
-                                            >
-
-                                                <svg
-                                                    class="h-3.5 w-3.5"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h5"
-                                                    />
-
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1-1-4 9.5-9.5z"
-                                                    />
-
+                                            <button type="button" onclick="openEditModal({{ $item->id_data_dukung }})" class="inline-flex items-center gap-1 rounded-md bg-[#f5bd18] px-2.5 py-1.5 text-[10px] font-bold text-white shadow-sm transition hover:bg-[#dfa900] dark:hover:bg-[#f5bd18]/80">
+                                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h5" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1-1-4 9.5-9.5z" />
                                                 </svg>
-
                                                 Edit
-
                                             </button>
-
                                         </div>
-
                                     </td>
-
                                 </tr>
 
-
-                                {{-- =================================================
-                                     CATATAN ASESOR
-                                ================================================== --}}
-
+                                {{-- CATATAN ASESOR --}}
                                 @if(!empty($item->catatan_asesor))
-
                                     <tr>
-
-                                        <td
-                                            colspan="7"
-                                            class="border-b border-gray-200 bg-[#fff9f9] px-5 py-3 dark:border-gray-700 dark:bg-red-950/20"
-                                        >
-
+                                        <td colspan="7" class="border-b border-gray-200 bg-[#fff9f9] px-5 py-3 dark:border-slate-700/80 dark:bg-red-950/20">
                                             <div class="flex items-start gap-2">
-
-                                                <svg
-                                                    class="mt-0.5 h-4 w-4 shrink-0 text-red-500"
-                                                    fill="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-
-                                                    <path
-                                                        fill-rule="evenodd"
-                                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4h2v5h-2V6zm0 6h2v2h-2v-2z"
-                                                        clip-rule="evenodd"
-                                                    />
-
+                                                <svg class="mt-0.5 h-4 w-4 shrink-0 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4h2v5h-2V6zm0 6h2v2h-2v-2z" clip-rule="evenodd" />
                                                 </svg>
-
-
-                                                <span class="text-xs font-bold text-red-600">
-                                                    Catatan Asesor:
-                                                </span>
-
-
-                                                <span class="text-xs text-gray-700 dark:text-gray-300">
-                                                    {{ $item->catatan_asesor }}
-                                                </span>
-
+                                                <span class="text-xs font-bold text-red-600 dark:text-red-400">Catatan Asesor:</span>
+                                                <span class="text-xs text-gray-700 dark:text-gray-300">{{ $item->catatan_asesor }}</span>
                                             </div>
-
                                         </td>
-
                                     </tr>
-
                                 @endif
 
                             @empty
-
                                 <tr>
-
-                                    <td
-                                        colspan="7"
-                                        class="border-b border-gray-200 px-5 py-12 text-center text-sm text-gray-400 dark:border-gray-700 dark:text-gray-500"
-                                    >
-
+                                    <td colspan="7" class="border-b border-gray-200 px-5 py-12 text-center text-sm text-gray-400 dark:border-slate-700/80 dark:text-gray-500">
                                         Belum ada Data Dukung pada tingkat ini.
-
                                     </td>
-
                                 </tr>
-
                             @endforelse
 
                         </tbody>
-
                     </table>
-
                 </div>
 
 
                 {{-- =================================================
                      PANDUAN PENILAIAN
-                ================================================== --}}
+                ================================================--}}
+                <div class="-mt-3 mx-6 mb-6 rounded-lg border border-[#00cece] bg-[#f2fcfc] p-4 shadow-sm dark:border-teal-700 dark:bg-teal-950/30">
+                    <div class="flex items-start gap-2">
+                        
+                        {{-- Icon Info --}}
+                        <svg class="mt-0.5 h-4 w-4 shrink-0 text-[#00baba]" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+                        </svg>
 
-                @if($panduanPenilaian)
-
-                    <div
-                        class="mx-6 mb-6 mt-5 rounded-lg bg-[#f0f9ff] px-5 py-4 dark:bg-[#12a89d]/10"
-                    >
-
-                        <div class="flex items-start gap-3">
-
-                            <svg
-                                class="mt-0.5 h-5 w-5 shrink-0 text-[#12a89d] dark:text-teal-400"
-                                fill="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-
-                                <path
-                                    fill-rule="evenodd"
-                                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
-                                    clip-rule="evenodd"
-                                />
-
-                            </svg>
-
-
-                            <div class="min-w-0 flex-1">
-
-                                <div
-                                    class="text-sm font-bold text-gray-900 dark:text-gray-100"
-                                >
-                                    Panduan Penilaian:
-                                </div>
-
-
-                                <div
-                                    class="mt-1 break-words text-sm leading-relaxed text-[#12a89d] dark:text-teal-300"
-                                >
-
-                                    {!! nl2br(e($panduanPenilaian)) !!}
-
-                                </div>
-
+                        <div class="min-w-0 flex-1">
+                            <div class="text-xs font-bold text-gray-800 dark:text-gray-100">
+                                Panduan Penilaian:
                             </div>
 
+                            <div class="mt-1 break-words text-xs leading-relaxed text-gray-700 dark:text-gray-300">
+                                Upload dokumen rancangan perencanaan instansi pemerintah yang memuat substansi Rencana Aksi Nasional Pemerintah Digital secara lengkap. Dokumen dapat berupa draft atau rancangan awal yang masih dalam tahap penyusunan.
+                            </div>
                         </div>
-
                     </div>
-
-                @endif
+                </div>
 
             </div>
 
@@ -1047,15 +654,6 @@
 
 </div>
 
-
-{{-- =========================================================
-     PARTIAL POPUP
-     
-     FILE TERPISAH:
-     internal/upload.blade.php
-     internal/detail.blade.php
-     internal/edit.blade.php
-========================================================= --}}
 
 @include(
     'user.penilaian.internal.upload',
@@ -1092,31 +690,17 @@
     id="criteriaModal"
     class="fixed inset-0 z-[9999] hidden items-center justify-center bg-gray-900/60 p-4 backdrop-blur-sm"
 >
-
     <div
-        class="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl dark:bg-gray-800"
+        class="flex w-full max-w-3xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl dark:bg-gray-800"
     >
-
         {{-- HEADER --}}
-        <div
-            class="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-gray-700"
-        >
-
+        <div class="flex items-center justify-between border-b border-gray-200 px-6 py-5 dark:border-gray-700">
             <div>
-
-                <h3
-                    class="text-lg font-bold text-gray-900 dark:text-white"
-                >
-                    Detail Kriteria
+                <h3 id="criteriaModalTitle" class="text-xl font-extrabold text-gray-900 dark:text-white">
+                    Tingkat Kematangan Level 1
                 </h3>
-
-                <p
-                    id="criteriaModalSubtitle"
-                    class="mt-1 text-xs text-gray-500 dark:text-gray-400"
-                ></p>
-
+                {{-- Subtitle dihilangkan karena pada gambar design menyatu dengan Title --}}
             </div>
-
 
             <button
                 type="button"
@@ -1125,18 +709,25 @@
             >
                 &times;
             </button>
-
         </div>
-
 
         {{-- CONTENT --}}
         <div
             id="criteriaModalContent"
-            class="overflow-y-auto p-6"
+            class="overflow-y-auto px-6 py-6 max-h-[65vh]"
         ></div>
 
+        {{-- FOOTER --}}
+        <div class="flex justify-end border-t border-gray-200 px-6 py-4 dark:border-gray-700">
+            <button
+                type="button"
+                onclick="closeCriteriaModal()"
+                class="rounded-md bg-[#00baba] px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#009e9e]"
+            >
+                Tutup
+            </button>
+        </div>
     </div>
-
 </div>
 
 
@@ -1294,141 +885,126 @@
     |--------------------------------------------------------------------------
     */
 
-    function openCriteriaModal(
-        levelId
-    ) {
+    function openCriteriaModal(levelId) {
+        const data = criteriaData[levelId];
 
-        const data =
-            criteriaData[levelId];
+        if (!data) return;
 
+        const modal = document.getElementById('criteriaModal');
+        const content = document.getElementById('criteriaModalContent');
+        const titleEl = document.getElementById('criteriaModalTitle');
 
-        if (!data) {
-            return;
-        }
-
-
-        document.getElementById(
-            'criteriaModalSubtitle'
-        ).textContent =
-            'Tingkat ' +
-            data.level +
-            ' - ' +
-            data.nama;
-
-
-        const content =
-            document.getElementById(
-                'criteriaModalContent'
-            );
-
-
+        // Set Title sesuai level
+        titleEl.textContent = 'Tingkat Kematangan Level ' + data.level;
+        
         content.innerHTML = '';
 
-
-        if (
-            !data.items ||
-            data.items.length === 0
-        ) {
-
+        if (!data.items || data.items.length === 0) {
             content.innerHTML = `
-                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-8 text-center text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-700/50 dark:text-gray-400">
+                <div class="py-6 text-center text-sm text-gray-500">
                     Kriteria untuk tingkat ini belum tersedia.
                 </div>
             `;
-
         } else {
+            let fullHtml = '';
 
-            data.items.forEach(
-                function (
-                    item,
-                    index
-                ) {
+            data.items.forEach(function (item) {
+                let text = item.kriteria || '';
+                const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
 
-                    const box =
-                        document.createElement(
-                            'div'
-                        );
+                let sections = [];
+                let currentSection = null;
 
+                // 1. Parsing: Mengelompokkan teks berdasarkan Judul (Kriteria/Kondisi)
+                lines.forEach(line => {
+                    const trimmed = line.trim();
+                    if (trimmed === '') return;
 
-                    box.className =
-                        'mb-4 rounded-lg border border-gray-200 p-5 dark:border-gray-700 dark:bg-gray-700/50';
+                    const isHeading = !/^\d+\.\s*/.test(trimmed) && /:$/.test(trimmed);
 
+                    if (isHeading) {
+                        if (currentSection) sections.push(currentSection);
+                        currentSection = {
+                            title: trimmed,
+                            items: []
+                        };
+                    } else {
+                        if (!currentSection) {
+                            currentSection = { title: '', items: [] };
+                        }
 
-                    let html = `
+                        const numberMatch = trimmed.match(/^(\d+)\.\s*(.*)$/);
+                        if (numberMatch) {
+                            currentSection.items.push({
+                                type: 'number',
+                                num: numberMatch[1],
+                                text: numberMatch[2]
+                            });
+                        } else {
+                            // Jika ini baris lanjutan dari nomor sebelumnya, gabungkan.
+                            let lastItem = currentSection.items[currentSection.items.length - 1];
+                            if (lastItem && lastItem.type === 'number') {
+                                lastItem.text += '\n' + trimmed;
+                            } else {
+                                currentSection.items.push({
+                                    type: 'text',
+                                    text: trimmed
+                                });
+                            }
+                        }
+                    }
+                });
+                
+                if (currentSection) sections.push(currentSection);
+                const iconSvg = `
+                    <svg class="mt-0.5 h-4 w-4 shrink-0 text-[#00baba]" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                    </svg>
+                `;
 
-                        <div class="text-sm font-medium leading-relaxed text-gray-900 dark:text-gray-200">
-
-                            <span class="mr-1.5 font-bold text-[#12a89d] dark:text-teal-400">
-
-                                ${index + 1}.
-
-                            </span>
-
-                            ${escapeHtml(item.kriteria)}
-
-                        </div>
-
+                sections.forEach(sec => {
+                    fullHtml += `
+                        <div class="mb-5 rounded-lg border border-[#00cece] bg-[#f2fcfc] p-5 shadow-sm last:mb-0 dark:border-teal-700 dark:bg-teal-950/20">
+                            ${sec.title ? `
+                                <div class="mb-3 flex items-start gap-2.5">
+                                    ${iconSvg}
+                                    <span class="text-[15px] font-bold text-gray-800 dark:text-gray-100">${escapeHtml(sec.title)}</span>
+                                </div>
+                            ` : ''}
+                            
+                            <div class="${sec.title ? 'ml-[26px]' : ''} text-sm text-gray-700 leading-relaxed dark:text-gray-300">
                     `;
 
-
-                    if (item.bukti) {
-
-                        html += `
-
-                            <div class="mt-3 rounded-lg bg-[#f0f9ff] p-3.5 dark:bg-[#12a89d]/10">
-
-                                <div class="mb-1 text-xs font-bold text-[#12a89d] dark:text-teal-400">
-
-                                    Bukti yang Dibutuhkan
-
+                    sec.items.forEach(it => {
+                        if (it.type === 'number') {
+                            fullHtml += `
+                                <div class="mb-1.5 flex items-start gap-2">
+                                    <div class="w-4 shrink-0 text-right">${it.num}.</div>
+                                    <div class="min-w-0 flex-1 whitespace-pre-line">${escapeHtml(it.text)}</div>
                                 </div>
+                            `;
+                        } else {
+                            fullHtml += `
+                                <div class="mb-1.5 whitespace-pre-line">${escapeHtml(it.text)}</div>
+                            `;
+                        }
+                    });
 
-                                <div class="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
-
-                                    ${escapeHtml(item.bukti)}
-
-                                </div>
-
+                    fullHtml += `
                             </div>
+                        </div>
+                    `;
+                });
+            });
 
-                        `;
-
-                    }
-
-
-                    box.innerHTML =
-                        html;
-
-
-                    content.appendChild(
-                        box
-                    );
-
-                }
-            );
-
+            content.innerHTML = fullHtml;
         }
 
-
-        const modal =
-            document.getElementById(
-                'criteriaModal'
-            );
-
-
-        modal.classList.remove(
-            'hidden'
-        );
-
-        modal.classList.add(
-            'flex'
-        );
-
-
-        document.body.style.overflow =
-            'hidden';
-
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
     }
+
 
 
     /*

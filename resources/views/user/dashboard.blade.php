@@ -133,45 +133,66 @@
 
         {{-- AKTIVITAS --}}
         <div class="overflow-hidden rounded-xl border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800">
+
             <div class="border-b border-gray-200 px-6 py-5 dark:border-gray-700">
-                <h2 class="text-xl font-bold text-blue-900 dark:text-blue-300">Aktivitas Anda</h2>
+                <h2 class="text-xl font-bold text-blue-900 dark:text-blue-300">
+                    Aktivitas Anda
+                </h2>
             </div>
 
             <div class="px-6">
 
-                <div class="flex gap-4 border-b border-gray-200 py-5 dark:border-gray-700">
-                    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-blue-200 dark:border-blue-800">
-                        <div class="h-4 w-4 rounded-full border-2 border-blue-700 bg-white dark:bg-gray-800"></div>
+                @forelse($aktivitas as $item)
+
+                    <div class="flex gap-4 border-b border-gray-200 py-5 last:border-b-0 dark:border-gray-700">
+
+                        {{-- ICON --}}
+                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-blue-200 dark:border-blue-800">
+                            <div class="h-4 w-4 rounded-full border-2 border-blue-700 bg-white dark:bg-gray-800"></div>
+                        </div>
+
+                        {{-- INFORMASI AKTIVITAS --}}
+                        <div class="min-w-0">
+
+                            <p class="text-base font-medium text-gray-900 dark:text-white">
+                                {{ $item->deskripsi ?? $item->aksi }}
+                            </p>
+
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                {{ \Carbon\Carbon::parse($item->created_at)->locale('id')->translatedFormat('d M Y H.i') }}
+                                WIB
+                            </p>
+
+                        </div>
+
                     </div>
 
-                    <div class="min-w-0">
-                        <p class="text-base font-medium text-gray-900 dark:text-white">Login ke Sistem</p>
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            @if($user->last_login)
-                                {{ \Carbon\Carbon::parse($user->last_login)->translatedFormat('d M Y H.i') }} WIB
-                            @else
-                                Belum ada data login terakhir
-                            @endif
-                        </p>
-                    </div>
-                </div>
+                @empty
 
-                <div class="flex gap-4 py-5">
-                    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-gray-200 dark:border-gray-700">
-                        <div class="h-4 w-4 rounded-full border-2 border-gray-400 bg-white dark:bg-gray-800"></div>
+                    <div class="flex gap-4 py-5">
+
+                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-gray-200 dark:border-gray-700">
+                            <div class="h-4 w-4 rounded-full border-2 border-gray-400 bg-white dark:bg-gray-800"></div>
+                        </div>
+
+                        <div class="min-w-0">
+
+                            <p class="text-base font-medium text-gray-500 dark:text-gray-400">
+                                Belum ada aktivitas
+                            </p>
+
+                            <p class="mt-1 text-sm text-gray-400 dark:text-gray-500">
+                                Aktivitas Anda akan tampil di sini.
+                            </p>
+
+                        </div>
+
                     </div>
 
-                    <div class="min-w-0">
-                        <p class="text-base font-medium text-gray-500 dark:text-gray-400">
-                            Belum ada aktivitas lainnya
-                        </p>
-                        <p class="mt-1 text-sm text-gray-400 dark:text-gray-500">
-                            Aktivitas penilaian akan tampil di sini.
-                        </p>
-                    </div>
-                </div>
+                @endforelse
 
             </div>
+
         </div>
 
     </div>

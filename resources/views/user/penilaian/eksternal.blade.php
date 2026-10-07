@@ -206,7 +206,7 @@
                             type="submit"
                             class="inline-flex h-11 items-center rounded-lg bg-[#0da7a4] px-6 text-sm font-semibold text-white shadow-sm transition hover:bg-[#098f8d]"
                         >
-                            Simpan Catatan
+                            Simpan
                         </button>
                     </div>
                 </div>
@@ -257,42 +257,89 @@
 
                 <div class="text-sm font-semibold text-gray-900 dark:text-white">Bukti Pendukung<span class="text-red-500">*</span></div>
 
-                <div class="mt-3 rounded-xl border border-gray-300 bg-white p-4 dark:border-gray-600 dark:bg-gray-800">
-                    <div class="flex items-center justify-between gap-4">
-                        <div class="flex min-w-0 items-center gap-4">
-                            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-500 dark:bg-red-950/30">
-                                <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm7 1.5L18.5 9H14a1 1 0 0 1-1-1V3.5zM8 13h2.2c1.5 0 2.4.8 2.4 2s-.9 2-2.4 2H9.5v2H8v-6zm1.5 1.2v1.6h.7c.6 0 .9-.3.9-.8s-.3-.8-.9-.8h-.7zm4.2-1.2h2c1.8 0 2.8 1 2.8 3s-1 3-2.8 3h-2v-6zm1.5 1.3v3.4h.5c.9 0 1.3-.5 1.3-1.7s-.4-1.7-1.3-1.7h-.5z"/>
-                                </svg>
-                            </div>
-                            <div class="min-w-0">
-                                <div class="truncate text-sm font-semibold text-gray-800 dark:text-white">{{ $bukti->file_name }}</div>
-                                <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                    {{ number_format(($bukti->file_size ?? 0) / 1048576, 2, ',', '.') }} MB
-                                </div>
-                            </div>
-                        </div>
+<div class="mt-3 rounded-xl border border-gray-300 bg-white p-4 dark:border-gray-600 dark:bg-gray-800">
+    <div class="flex items-start justify-between gap-4">
 
-                        <div class="flex shrink-0 items-center gap-2">
-                            <a
-                                href="{{ asset('storage/' . $bukti->file_path) }}"
-                                target="_blank"
-                                class="inline-flex h-9 items-center justify-center rounded-lg border border-[#59c9c8] px-4 text-xs font-semibold text-[#159b99] hover:bg-[#eafafa]"
-                            >
-                                Lihat
-                            </a>
-                            <form action="{{ route('user.penilaian.eksternal.document.destroy', [$indikator->id_indikator, $bukti->id_dokumen]) }}" method="POST" onsubmit="return confirm('Hapus bukti pendukung ini? Bukti wajib diupload kembali.');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30" title="Hapus">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3m-9 0h12"/>
-                                    </svg>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+        {{-- INFO FILE --}}
+        <div class="flex min-w-0 items-start gap-4">
+
+            {{-- ICON FILE --}}
+            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-500 dark:bg-red-950/30">
+                <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v6h6v10H6z"/>
+                </svg>
+            </div>
+
+            {{-- DETAIL FILE --}}
+            <div class="min-w-0 text-sm">
+
+                {{-- Nama File --}}
+                <div class="truncate font-bold text-gray-800 dark:text-gray-200">
+                    {{ $bukti->file_name }}
                 </div>
+
+                {{-- Detail --}}
+                <div class="mt-1 grid grid-cols-[120px_10px_1fr] gap-y-1 text-xs text-gray-500 dark:text-gray-400">
+
+                    {{-- Ukuran --}}
+                    <div>Ukuran File</div>
+                    <div>:</div>
+                    <span>
+                        {{ number_format(($bukti->file_size ?? 0) / 1024, 2, ',', '.') }} KB
+                    </span>
+
+                    {{-- Tanggal Upload --}}
+                    <div>Tanggal Upload</div>
+                    <div>:</div>
+                    <span>
+                        {{ $bukti->created_at
+                            ? \Carbon\Carbon::parse($bukti->created_at)->locale('id')->translatedFormat('j F Y \p\u\k\u\l H.i \W\I\B')
+                            : '-' }}
+                    </span>
+
+                    {{-- Diunggah Oleh --}}
+                    <div>Diunggah Oleh</div>
+                    <div>:</div>
+                    <span>
+                        {{ Auth::user()->name ?? 'Pengguna' }}
+                    </span>
+
+                </div>
+            </div>
+        </div>
+
+        {{-- ACTION --}}
+        <div class="flex shrink-0 items-center gap-2">
+
+    {{-- Lihat --}}
+    <a
+        href="{{ asset('storage/' . $bukti->file_path) }}"
+        target="_blank"
+        class="inline-flex h-9 items-center justify-center rounded-lg border border-[#59c9c8] px-4 text-xs font-semibold text-[#159b99] hover:bg-[#eafafa]"
+    >
+        Lihat
+    </a>
+
+    {{-- Hapus --}}
+    <form
+        action="{{ route('user.penilaian.eksternal.document.destroy', [$indikator->id_indikator, $bukti->id_dokumen]) }}"
+        method="POST"
+        onsubmit="return confirm('Hapus bukti pendukung ini? Bukti wajib diupload kembali.');"
+    >
+        @csrf
+        @method('DELETE')
+
+        <button
+            type="submit"
+            class="inline-flex h-9 items-center justify-center rounded-lg border border-red-500 px-4 text-xs font-semibold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+        >
+            Hapus
+        </button>
+    </form>
+
+</div>
+    </div>
+</div>
             </div>
 
             <div class="flex items-start justify-center rounded-xl bg-[#16bdb9] p-7 text-white shadow-sm">

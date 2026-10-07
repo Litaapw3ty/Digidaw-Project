@@ -83,8 +83,8 @@ Route::get('/penilaian/eksternal/{id}', [PenilaianEksternalController::class, 's
 Route::post('/penilaian/eksternal/{id}', [PenilaianEksternalController::class, 'store'])
     ->name('penilaian.eksternal.store');
 
-Route::delete('/penilaian/eksternal/{id}/bukti', [PenilaianEksternalController::class, 'destroyBukti'])
-    ->name('penilaian.eksternal.bukti.destroy');
+Route::delete('/penilaian/eksternal/{id}/document/{document}', [PenilaianEksternalController::class, 'destroyDocument'])
+    ->name('penilaian.eksternal.document.destroy');
 
 /*
 |--------------------------------------------------------------------------

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -207,8 +208,6 @@ class PenilaianInternalController extends Controller
                 true
             );
 
-            // Value selalu menampilkan bobot data dukung.
-            // Kontribusi aktual untuk PM disimpan terpisah di $item->terpenuhi.
             $item->value = (float) $item->bobot;
             $item->terpenuhi = $sudahUpload
                 ? (float) $item->bobot
@@ -225,24 +224,6 @@ class PenilaianInternalController extends Controller
         $dataDukungPerTingkat = $dataDukung->groupBy(
             'id_tingkat'
         );
-
-        /*
-        |--------------------------------------------------------------------------
-        | PM PER TINGKAT
-        |--------------------------------------------------------------------------
-        |
-        | Contoh:
-        |
-        | Bobot data dukung:
-        | 0.5
-        |
-        | Belum upload:
-        | PM = 0 / 0.5
-        |
-        | Sudah upload:
-        | PM = 0.5 / 0.5
-        |
-        */
 
         $pmPerTingkat = [];
 
@@ -336,9 +317,6 @@ class PenilaianInternalController extends Controller
         |--------------------------------------------------------------------------
         | NILAI INDIKATOR
         |--------------------------------------------------------------------------
-        |
-        | Nilai awal tetap 1.
-        |
         */
 
         $nilai = (float) (
@@ -370,7 +348,7 @@ class PenilaianInternalController extends Controller
             'PANDUAN'
         );
 
-        if ($panduanUmum) {
+        if ($panduanUmum && !empty($panduanUmum->deskripsi)) {
             $panduanPenilaian = $panduanUmum->deskripsi;
         }
 
@@ -408,6 +386,392 @@ class PenilaianInternalController extends Controller
     | UPLOAD DOKUMEN
     |--------------------------------------------------------------------------
     */
+
+    public function update(Request $request, $id, $dataDukung)
+    {
+        $user = Auth::user();
+
+        /*
+        |--------------------------------------------------------------------------
+        | VALIDASI
+        |--------------------------------------------------------------------------
+        */
+
+        $request->validate([
+            'catatan_user' => [
+                'required',
+                'string',
+                'max:1000',
+                function ($attribute, $value, $fail) {
+                    $words = preg_split('/\s+/', trim($value));
+
+                    if (count(array_filter($words)) < 10) {
+                        $fail('Catatan minimal 10 kata.');
+                    }
+                },
+            ],
+
+            'dokumen' => [
+                'nullable',
+                'file',
+                'max:20480',
+                'mimes:pdf,doc,docx',
+            ],
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | INSTANSI USER
+        |--------------------------------------------------------------------------
+        */
+
+        $instansi = DB::table('instansi')
+            ->where('id_instansi', $user->id_instansi)
+            ->where('status', 'AKTIF')
+            ->first();
+
+        if (!$instansi) {
+            abort(403, 'Instansi user tidak valid.');
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | EVALUASI
+        |--------------------------------------------------------------------------
+        */
+
+        $evaluasi = DB::table('evaluasi')
+            ->where('id_instansi', $instansi->id_instansi)
+            ->where('tahun', now()->year)
+            ->first();
+
+        if (!$evaluasi) {
+            abort(404, 'Evaluasi belum tersedia.');
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | EVALUASI INDIKATOR
+        |--------------------------------------------------------------------------
+        */
+
+        $evaluasiIndikator = DB::table('evaluasi_indikator')
+            ->where('id_evaluasi', $evaluasi->id_evaluasi)
+            ->where('id_indikator', $id)
+            ->first();
+
+        if (!$evaluasiIndikator) {
+            abort(404, 'Evaluasi indikator tidak ditemukan.');
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | DATA DUKUNG
+        |--------------------------------------------------------------------------
+        */
+
+        $dataDukungRow = DB::table('data_dukung')
+            ->where('id_data_dukung', $dataDukung)
+            ->where('id_indikator', $id)
+            ->where('status', 'AKTIF')
+            ->first();
+
+        if (!$dataDukungRow) {
+            abort(404, 'Data dukung tidak ditemukan.');
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | EVALUASI DATA DUKUNG
+        |--------------------------------------------------------------------------
+        */
+
+        $evaluasiDataDukung = DB::table('evaluasi_data_dukung')
+            ->where(
+                'id_evaluasi_indikator',
+                $evaluasiIndikator->id_evaluasi_indikator
+            )
+            ->where(
+                'id_data_dukung',
+                $dataDukungRow->id_data_dukung
+            )
+            ->first();
+
+        if (!$evaluasiDataDukung) {
+            abort(404, 'Evaluasi data dukung tidak ditemukan.');
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | UPDATE KETERANGAN USER
+        |--------------------------------------------------------------------------
+        */
+
+        DB::table('evaluasi_data_dukung')
+            ->where(
+                'id_evaluasi_data_dukung',
+                $evaluasiDataDukung->id_evaluasi_data_dukung
+            )
+            ->update([
+                'keterangan' => $request->catatan_user,
+                'status' => 'TERKIRIM',
+                'updated_at' => now(),
+            ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | CEK FILE BARU
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->hasFile('dokumen')) {
+
+            /*
+            | Ambil versi terakhir
+            */
+
+            $versiTerakhir = DB::table('dokumen_bukti')
+                ->where(
+                    'id_evaluasi_data_dukung',
+                    $evaluasiDataDukung->id_evaluasi_data_dukung
+                )
+                ->max('versi');
+
+            $versi = ($versiTerakhir ?? 0) + 1;
+
+            /*
+            | Tandai dokumen lama sebagai DIGANTI
+            */
+
+            DB::table('dokumen_bukti')
+                ->where(
+                    'id_evaluasi_data_dukung',
+                    $evaluasiDataDukung->id_evaluasi_data_dukung
+                )
+                ->where('status', 'AKTIF')
+                ->update([
+                    'status' => 'DIGANTI',
+                ]);
+
+            /*
+            | Simpan file baru
+            */
+
+            $file = $request->file('dokumen');
+
+            $path = $file->store(
+                'dokumen-bukti/' . $instansi->id_instansi,
+                'public'
+            );
+
+            /*
+            | Insert dokumen baru
+            */
+
+            DB::table('dokumen_bukti')->insert([
+                'id_evaluasi_data_dukung' =>
+                    $evaluasiDataDukung->id_evaluasi_data_dukung,
+
+                'uploaded_by' => $user->id_user,
+
+                'file_name' =>
+                    $file->getClientOriginalName(),
+
+                'file_path' => $path,
+
+                'file_type' =>
+                    $file->getClientMimeType(),
+
+                'file_size' =>
+                    $file->getSize(),
+
+                'catatan_user' =>
+                    $request->catatan_user,
+
+                'versi' => $versi,
+
+                'status' => 'AKTIF',
+
+                'created_at' => now(),
+            ]);
+
+        } else {
+
+            /*
+            |--------------------------------------------------------------------------
+            | TIDAK ADA FILE BARU
+            |--------------------------------------------------------------------------
+            |
+            | Dokumen lama tetap AKTIF.
+            | Hanya catatan user yang diperbarui.
+            |
+            */
+
+            DB::table('dokumen_bukti')
+                ->where(
+                    'id_evaluasi_data_dukung',
+                    $evaluasiDataDukung->id_evaluasi_data_dukung
+                )
+                ->where('status', 'AKTIF')
+                ->update([
+                    'catatan_user' => $request->catatan_user,
+                ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | AUDIT LOG
+        |--------------------------------------------------------------------------
+        */
+
+        AuditLog::create([
+            'id_user' => Auth::id(),
+            'aksi' => 'EDIT_DATA_DUKUNG',
+            'tabel_target' => 'evaluasi_data_dukung',
+            'id_target' => $evaluasiDataDukung->id_evaluasi_data_dukung,
+            'deskripsi' => 'Memperbarui data dukung.',
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | KEMBALI
+        |--------------------------------------------------------------------------
+        */
+
+        return redirect()
+            ->route(
+                'user.penilaian.internal',
+                $id
+            )
+            ->with(
+                'success',
+                'Data dukung berhasil diperbarui.'
+            );
+    }
+
+    public function destroyDocument($id, $dataDukung, $document)
+    {
+        $user = Auth::user();
+
+        // Pastikan instansi user valid
+        $instansi = DB::table('instansi')
+            ->where('id_instansi', $user->id_instansi)
+            ->where('status', 'AKTIF')
+            ->first();
+
+        if (!$instansi) {
+            abort(403, 'Instansi user tidak valid.');
+        }
+
+        // Pastikan evaluasi tahun berjalan milik instansi user
+        $evaluasi = DB::table('evaluasi')
+            ->where('id_instansi', $instansi->id_instansi)
+            ->where('tahun', now()->year)
+            ->first();
+
+        if (!$evaluasi) {
+            abort(404, 'Evaluasi belum tersedia.');
+        }
+
+        // Pastikan indikator memang milik evaluasi tersebut
+        $evaluasiIndikator = DB::table('evaluasi_indikator')
+            ->where('id_evaluasi', $evaluasi->id_evaluasi)
+            ->where('id_indikator', $id)
+            ->first();
+
+        if (!$evaluasiIndikator) {
+            abort(404, 'Evaluasi indikator tidak ditemukan.');
+        }
+
+        // Pastikan data dukung memang milik indikator tersebut
+        $dataDukungRow = DB::table('data_dukung')
+            ->where('id_data_dukung', $dataDukung)
+            ->where('id_indikator', $id)
+            ->where('status', 'AKTIF')
+            ->first();
+
+        if (!$dataDukungRow) {
+            abort(404, 'Data dukung tidak ditemukan.');
+        }
+
+        // Pastikan evaluasi_data_dukung sesuai dengan indikator + data dukung
+        $evaluasiDataDukung = DB::table('evaluasi_data_dukung')
+            ->where(
+                'id_evaluasi_indikator',
+                $evaluasiIndikator->id_evaluasi_indikator
+            )
+            ->where(
+                'id_data_dukung',
+                $dataDukungRow->id_data_dukung
+            )
+            ->first();
+
+        if (!$evaluasiDataDukung) {
+            abort(404, 'Evaluasi data dukung tidak ditemukan.');
+        }
+
+        // Ambil dokumen yang akan dihapus
+        $dokumen = DB::table('dokumen_bukti')
+            ->where('id_dokumen', $document)
+            ->where(
+                'id_evaluasi_data_dukung',
+                $evaluasiDataDukung->id_evaluasi_data_dukung
+            )
+            ->where('status', 'AKTIF')
+            ->first();
+
+        if (!$dokumen) {
+            abort(404, 'Dokumen tidak ditemukan.');
+        }
+
+        DB::table('dokumen_bukti')
+            ->where('id_dokumen', $dokumen->id_dokumen)
+            ->update([
+                'status' => 'DIHAPUS',
+            ]);
+
+        $masihAdaDokumenAktif = DB::table('dokumen_bukti')
+            ->where(
+                'id_evaluasi_data_dukung',
+                $evaluasiDataDukung->id_evaluasi_data_dukung
+            )
+            ->where('status', 'AKTIF')
+            ->exists();
+
+        if (!$masihAdaDokumenAktif) {
+            DB::table('evaluasi_data_dukung')
+                ->where(
+                    'id_evaluasi_data_dukung',
+                    $evaluasiDataDukung->id_evaluasi_data_dukung
+                )
+                ->update([
+                    'status' => 'BELUM_DIISI',
+                    'updated_at' => now(),
+                ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | AUDIT LOG
+        |--------------------------------------------------------------------------
+        */
+
+        AuditLog::create([
+            'id_user' => Auth::id(),
+            'aksi' => 'HAPUS_DOKUMEN',
+            'tabel_target' => 'dokumen_bukti',
+            'id_target' => $dokumen->id_dokumen,
+            'deskripsi' => 'Menghapus dokumen data dukung.',
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+
+        return redirect()
+            ->route('user.penilaian.internal', $id)
+            ->with('success', 'Dokumen berhasil dihapus.');
+    }
 
     public function upload(Request $request, $id)
     {
@@ -678,6 +1042,22 @@ class PenilaianInternalController extends Controller
 
             'created_at' =>
                 now(),
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | AUDIT LOG
+        |--------------------------------------------------------------------------
+        */
+
+        AuditLog::create([
+            'id_user' => Auth::id(),
+            'aksi' => 'UPLOAD_DATA_DUKUNG',
+            'tabel_target' => 'dokumen_bukti',
+            'id_target' => $evaluasiDataDukung->id_evaluasi_data_dukung,
+            'deskripsi' => 'Mengunggah dokumen data dukung.',
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
         ]);
 
         /*
