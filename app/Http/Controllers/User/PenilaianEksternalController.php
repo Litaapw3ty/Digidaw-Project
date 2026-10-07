@@ -556,8 +556,8 @@ class PenilaianEksternalController extends Controller
             })
             ->update([
                 'nilai_eksternal' => null,
-                'nilai' => null,
-                'level_kematangan' => null,
+                'nilai' => 1,
+                'level_kematangan' => 1,
                 'status_pengisian' => 'BELUM_DIISI',
                 'updated_at' => now(),
             ]);
