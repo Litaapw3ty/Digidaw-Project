@@ -44,6 +44,11 @@ Route::middleware(['auth'])->group(function () {
         '/verifikasi/{id_instansi}/detail/{no_indikator}/{id_data_dukung}',
         [VerifikasiController::class, 'showVerificationDetail']
     )->name('verifikasi.detail.page');
+
+    Route::get(
+        '/verifikasi/{id_instansi}/dokumen/{id_dokumen}',
+        [VerifikasiController::class, 'showDocument']
+    )->name('verifikasi.document');
 });
 
 
@@ -56,6 +61,12 @@ Route::get('/monitoring', [MonitoringController::class, 'index'])
 
 Route::get('/monitoring/{id_instansi}', [MonitoringController::class, 'detail'])
     ->name('monitoring.detail');
+
+Route::get('/asesor/monitoring/{id_instansi}', [MonitoringController::class, 'detail'])
+    ->name('asesor.monitoring.detail');
+
+Route::get('/monitoring/{id_instansi}/aspek/{id_aspek}', [MonitoringController::class, 'detailAspek'])
+    ->name('monitoring.aspek');
 
 
 // =====================================================
@@ -90,7 +101,13 @@ Route::get(
     [PanduanController::class, 'file']
 )->name('panduan.file');
 
+Route::post(
+    '/target-instansi',
+    [PanduanController::class, 'updateTarget']
+)->name('target-instansi.update');
+
 });
+
 
 
 

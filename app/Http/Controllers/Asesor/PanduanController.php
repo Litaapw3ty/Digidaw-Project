@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Asesor;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -37,9 +38,141 @@ class PanduanController extends Controller
             ->orderBy('ap.nomor_aspek')
             ->get();
 
+
+        // =================================================
+        // AMBIL TARGET INSTANSI
+        // =================================================
+
+        $asesor = DB::table('asesor')
+            ->where('id_user', auth()->id())
+            ->where('status', 'AKTIF')
+            ->first();
+
+        $targetInstansi = null;
+
+        if ($asesor) {
+            $evaluasi = DB::table('evaluasi')
+                ->where('id_asesor', $asesor->id_asesor)
+                ->orderByDesc('tahun')
+                ->orderByDesc('id_evaluasi')
+                ->first();
+
+            $targetInstansi = $evaluasi?->target_instansi;
+        }
+
+
         return view(
             'asesor.kelola_panduan',
-            compact('aspekList')
+            compact(
+                'aspekList',
+                'targetInstansi'
+            )
+        );
+    }
+
+
+    // =====================================================
+    // UPDATE TARGET INSTANSI
+    // =====================================================
+
+    public function updateTarget(Request $request)
+    {
+        // -------------------------------------------------
+        // VALIDASI
+        // -------------------------------------------------
+
+        $request->validate([
+            'target_instansi' => [
+                'required',
+                'numeric',
+                'min:0',
+                'max:5',
+            ],
+        ], [
+            'target_instansi.required' =>
+                'Target instansi wajib diisi.',
+
+            'target_instansi.numeric' =>
+                'Target instansi harus berupa angka.',
+
+            'target_instansi.min' =>
+                'Target instansi minimal 0.',
+
+            'target_instansi.max' =>
+                'Target instansi maksimal 5.',
+        ]);
+
+
+        // -------------------------------------------------
+        // CARI ASESOR LOGIN
+        // -------------------------------------------------
+
+        $asesor = DB::table('asesor')
+            ->where('id_user', auth()->id())
+            ->where('status', 'AKTIF')
+            ->first();
+
+        if (!$asesor) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'target_instansi' =>
+                        'Data asesor untuk akun yang sedang login tidak ditemukan.'
+                ]);
+        }
+
+
+        // -------------------------------------------------
+        // CARI EVALUASI TERBARU ASESOR
+        // -------------------------------------------------
+
+        $evaluasi = DB::table('evaluasi')
+            ->where('id_asesor', $asesor->id_asesor)
+            ->orderByDesc('tahun')
+            ->orderByDesc('id_evaluasi')
+            ->first();
+
+        if (!$evaluasi) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'target_instansi' =>
+                        'Evaluasi untuk asesor ini belum tersedia.'
+                ]);
+        }
+
+
+        // -------------------------------------------------
+        // UPDATE TARGET
+        // -------------------------------------------------
+
+        DB::table('evaluasi')
+            ->where('id_evaluasi', $evaluasi->id_evaluasi)
+            ->update([
+                'target_instansi' => $request->target_instansi,
+                'updated_at' => now(),
+            ]);
+
+
+        // -------------------------------------------------
+        // AUDIT LOG
+        // -------------------------------------------------
+
+        AuditLog::record(
+            'UPDATE_TARGET_INSTANSI',
+            'evaluasi',
+            $evaluasi->id_evaluasi,
+            "Target instansi tahun {$evaluasi->tahun} diubah menjadi {$request->target_instansi}."
+        );
+
+
+        // -------------------------------------------------
+        // KEMBALI KE KELOLA PANDUAN
+        // -------------------------------------------------
+
+        return back()->with(
+            'success',
+            'Target instansi berhasil disimpan.'
         );
     }
 
@@ -75,7 +208,10 @@ class PanduanController extends Controller
             ->first();
 
         if (!$indikator) {
-            abort(404, 'Indikator tidak ditemukan atau tidak sesuai dengan aspek');
+            abort(
+                404,
+                'Indikator tidak ditemukan atau tidak sesuai dengan aspek'
+            );
         }
 
         $dataDukung = null;
@@ -88,7 +224,10 @@ class PanduanController extends Controller
                 ->first();
 
             if (!$dataDukung) {
-                abort(404, 'Data dukung tidak ditemukan atau tidak sesuai dengan indikator');
+                abort(
+                    404,
+                    'Data dukung tidak ditemukan atau tidak sesuai dengan indikator'
+                );
             }
         }
 
@@ -122,9 +261,11 @@ class PanduanController extends Controller
 
         $hasPanduan = in_array('PANDUAN', $existingTypes);
         $hasTemplate = in_array('TEMPLATE', $existingTypes);
-        $defaultTipe = $editPanduan?->tipe ?? (request()->query('jenis') === 'template'
-            ? 'TEMPLATE'
-            : 'PANDUAN');
+
+        $defaultTipe = $editPanduan?->tipe ??
+            (request()->query('jenis') === 'template'
+                ? 'TEMPLATE'
+                : 'PANDUAN');
 
 
         // =================================================
@@ -160,7 +301,6 @@ class PanduanController extends Controller
                 $panduan->file_url = null;
                 $panduan->file_exists = false;
             }
-
         }
 
 
@@ -296,14 +436,29 @@ class PanduanController extends Controller
                 'mimes:pdf,doc,docx,xls,xlsx'
             ],
         ], [
-            'id_aspek.required' => 'Aspek penilaian wajib dipilih.',
-            'id_indikator.required' => 'Indikator terkait wajib dipilih.',
-            'id_data_dukung.required' => 'Data dukung wajib dipilih.',
-            'judul.required' => 'Judul panduan wajib diisi.',
-            'tipe.required' => 'Tipe dokumen wajib dipilih.',
-            'file.required_without' => 'File wajib diunggah untuk dokumen baru.',
-            'file.max' => 'Ukuran file maksimal 10MB.',
-            'file.mimes' => 'File harus berupa PDF, DOC, DOCX, XLS, atau XLSX.',
+            'id_aspek.required' =>
+                'Aspek penilaian wajib dipilih.',
+
+            'id_indikator.required' =>
+                'Indikator terkait wajib dipilih.',
+
+            'id_data_dukung.required' =>
+                'Data dukung wajib dipilih.',
+
+            'judul.required' =>
+                'Judul panduan wajib diisi.',
+
+            'tipe.required' =>
+                'Tipe dokumen wajib dipilih.',
+
+            'file.required_without' =>
+                'File wajib diunggah untuk dokumen baru.',
+
+            'file.max' =>
+                'Ukuran file maksimal 10MB.',
+
+            'file.mimes' =>
+                'File harus berupa PDF, DOC, DOCX, XLS, atau XLSX.',
         ]);
 
 
@@ -327,6 +482,7 @@ class PanduanController extends Controller
                 ]);
         }
 
+
         $dataDukung = DB::table('data_dukung')
             ->where('id_data_dukung', $request->id_data_dukung)
             ->where('id_indikator', $request->id_indikator)
@@ -334,15 +490,18 @@ class PanduanController extends Controller
             ->first();
 
         if (!$dataDukung) {
+
             return back()
                 ->withInput()
                 ->withErrors([
-                    'id_data_dukung' => 'Data dukung tidak sesuai dengan indikator yang dipilih.'
+                    'id_data_dukung' =>
+                        'Data dukung tidak sesuai dengan indikator yang dipilih.'
                 ]);
         }
 
 
         if ($request->filled('edit_id')) {
+
             $editPanduan = DB::table('panduan')
                 ->where('id_panduan', $request->edit_id)
                 ->where('id_indikator', $request->id_indikator)
@@ -351,10 +510,12 @@ class PanduanController extends Controller
                 ->first();
 
             if (!$editPanduan) {
+
                 return back()
                     ->withInput()
                     ->withErrors([
-                        'edit_id' => 'Dokumen tidak sesuai dengan indikator yang dipilih.'
+                        'edit_id' =>
+                            'Dokumen tidak sesuai dengan indikator yang dipilih.'
                     ]);
             }
         }
@@ -369,9 +530,16 @@ class PanduanController extends Controller
             ->where('id_data_dukung', $request->id_data_dukung)
             ->where('tipe', $request->tipe)
             ->where('status', 'AKTIF')
-            ->when($request->filled('edit_id'), function ($query) use ($request) {
-                $query->where('id_panduan', '!=', $request->edit_id);
-            });
+            ->when(
+                $request->filled('edit_id'),
+                function ($query) use ($request) {
+                    $query->where(
+                        'id_panduan',
+                        '!=',
+                        $request->edit_id
+                    );
+                }
+            );
 
         $existingPanduan = $existingPanduanQuery->exists();
 
@@ -415,6 +583,7 @@ class PanduanController extends Controller
         $filePath = null;
 
         if ($file) {
+
             $fileName = time()
                 . '_'
                 . preg_replace(
@@ -436,14 +605,33 @@ class PanduanController extends Controller
         // =================================================
 
         $existing = DB::table('panduan')
-            ->when($request->filled('edit_id'), function ($query) use ($request) {
-                $query->where('id_panduan', $request->edit_id);
-            }, function ($query) use ($request) {
-                $query->where('id_indikator', $request->id_indikator)
-                    ->where('id_data_dukung', $request->id_data_dukung)
-                    ->where('tipe', $request->tipe)
-                    ->where('status', 'AKTIF');
-            })
+            ->when(
+                $request->filled('edit_id'),
+                function ($query) use ($request) {
+                    $query->where(
+                        'id_panduan',
+                        $request->edit_id
+                    );
+                },
+                function ($query) use ($request) {
+                    $query->where(
+                        'id_indikator',
+                        $request->id_indikator
+                    )
+                    ->where(
+                        'id_data_dukung',
+                        $request->id_data_dukung
+                    )
+                    ->where(
+                        'tipe',
+                        $request->tipe
+                    )
+                    ->where(
+                        'status',
+                        'AKTIF'
+                    );
+                }
+            )
             ->first();
 
 
@@ -454,9 +642,12 @@ class PanduanController extends Controller
         if ($existing) {
 
             // Hapus file lama
-            if ($file &&
+            if (
+                $file &&
                 $existing->file_path &&
-                Storage::disk('public')->exists($existing->file_path)
+                Storage::disk('public')->exists(
+                    $existing->file_path
+                )
             ) {
                 Storage::disk('public')->delete(
                     $existing->file_path
@@ -473,13 +664,19 @@ class PanduanController extends Controller
 
             if ($file) {
                 $updateData['file_path'] = $filePath;
-                $updateData['file_name'] = $file->getClientOriginalName();
+                $updateData['file_name'] =
+                    $file->getClientOriginalName();
             }
 
             DB::table('panduan')
-                ->where('id_panduan', $existing->id_panduan)
+                ->where(
+                    'id_panduan',
+                    $existing->id_panduan
+                )
                 ->update($updateData);
 
+            $aksi = 'PERBARUI_PANDUAN';
+            $panduanId = $existing->id_panduan;
         }
 
 
@@ -489,7 +686,7 @@ class PanduanController extends Controller
 
         else {
 
-            DB::table('panduan')->insert([
+            $panduanId = DB::table('panduan')->insertGetId([
                 'id_asesor' => $asesor->id_asesor,
                 'id_aspek' => $request->id_aspek,
                 'id_indikator' => $request->id_indikator,
@@ -504,7 +701,22 @@ class PanduanController extends Controller
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+
+            $aksi = 'UPLOAD_PANDUAN';
         }
+
+
+        AuditLog::record(
+            $aksi,
+            'panduan',
+            $panduanId,
+            "{$request->tipe} '{$request->judul}' " .
+                (
+                    $aksi === 'UPLOAD_PANDUAN'
+                        ? 'diunggah.'
+                        : 'diperbarui.'
+                )
+        );
 
 
         // =================================================
@@ -512,9 +724,12 @@ class PanduanController extends Controller
         // =================================================
 
         return redirect()
-            ->route('asesor.panduan.detail', [
-                'idAspek' => $request->id_aspek
-            ])
+            ->route(
+                'asesor.panduan.detail',
+                [
+                    'idAspek' => $request->id_aspek
+                ]
+            )
             ->with(
                 'success',
                 $request->filled('edit_id')
@@ -615,7 +830,8 @@ class PanduanController extends Controller
                     $panduan->file_url = Storage::disk('public')
                         ->url($panduan->file_path);
 
-                    $panduan->file_exists = Storage::disk('public')
+                    $panduan->file_exists =
+                        Storage::disk('public')
                         ->exists($panduan->file_path);
 
                 } else {
@@ -633,7 +849,6 @@ class PanduanController extends Controller
 
         $totalIndikator = $indikatorList->count();
 
-
         $totalDataDukung = $indikatorList->sum(
             function ($indikator) {
 
@@ -646,14 +861,12 @@ class PanduanController extends Controller
             }
         );
 
-
         $totalTingkat = $indikatorList->sum(
             function ($indikator) {
 
                 return $indikator->tingkatList->count();
             }
         );
-
 
         $totalPanduan = $indikatorList->sum(
             function ($indikator) {
@@ -725,12 +938,24 @@ class PanduanController extends Controller
             ->delete();
 
 
+        AuditLog::record(
+            'HAPUS_PANDUAN',
+            'panduan',
+            $panduan->id_panduan,
+            "{$panduan->tipe} '{$panduan->judul}' dihapus."
+        );
+
+
         return back()->with(
             'success',
             'Dokumen berhasil dihapus.'
         );
     }
 
+
+    // =====================================================
+    // FILE PANDUAN
+    // =====================================================
 
     public function file($id)
     {
@@ -740,19 +965,30 @@ class PanduanController extends Controller
             ->first();
 
         if (!$panduan || !$panduan->file_path) {
-            abort(404, 'File dokumen tidak ditemukan.');
+            abort(
+                404,
+                'File dokumen tidak ditemukan.'
+            );
         }
+
 
         $disk = Storage::disk('public');
 
         if (!$disk->exists($panduan->file_path)) {
-            abort(404, 'File dokumen tidak ditemukan.');
+            abort(
+                404,
+                'File dokumen tidak ditemukan.'
+            );
         }
+
 
         return response()->file(
             $disk->path($panduan->file_path),
             [
-                'Content-Disposition' => 'inline; filename="' . addslashes($panduan->file_name) . '"',
+                'Content-Disposition' =>
+                    'inline; filename="' .
+                    addslashes($panduan->file_name) .
+                    '"',
             ]
         );
     }

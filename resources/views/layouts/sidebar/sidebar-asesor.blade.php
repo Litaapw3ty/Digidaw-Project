@@ -407,24 +407,46 @@
                 </a>
 
                 <!-- KELOLA kelola_panduan -->
-                <a href="{{ route('asesor.kelola_panduan') }}"
-                    class="relative flex items-center gap-[10px] h-[40px] mx-[4px] pl-[22px] pr-[12px] rounded-[4px] text-[16px]
-                        {{ request()->routeIs('asesor.kelola_panduan*') ? 'active-menu bg-[#eeeeee] text-[#333333] font-medium' : 'text-[#333333] hover:bg-gray-50'}}">
+            <!-- KELOLA PANDUAN -->
+<a href="{{ route('asesor.kelola_panduan') }}"
+    class="relative flex items-center gap-[10px] h-[40px] mx-[4px] pl-[22px] pr-[12px] rounded-[4px] text-[16px]
+    {{ request()->routeIs('asesor.kelola_panduan*', 'asesor.panduan.*')
+        ? 'active-menu bg-[#eeeeee] text-[#333333] font-medium'
+        : 'text-[#333333] hover:bg-gray-50'
+    }}">
 
-                    @if(request()->routeIs('asesor.kelola_panduan*'))
-                        <span class="active-indicator absolute left-[-3px] top-0 bottom-0 w-[3px] bg-[#f6c400] rounded-r-[2px]"></span>
-                    @endif
+    @if(request()->routeIs('asesor.kelola_panduan*', 'asesor.panduan.*'))
+        <span class="active-indicator absolute left-[-3px] top-0 bottom-0 w-[3px] bg-[#f6c400] rounded-r-[2px]"></span>
+    @endif
 
+    <svg
+        class="w-[18px] h-[18px] shrink-0"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+    >
+        <circle
+            cx="9"
+            cy="8"
+            r="3"
+            stroke-width="1.5"
+        ></circle>
 
-                    <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <circle cx="9" cy="8" r="3" stroke-width="1.5"></circle>
+        <path
+            stroke-linecap="round"
+            stroke-width="1.5"
+            d="M3 21c0-3.5 2.5-6 6-6"
+        ></path>
 
-                        <path stroke-linecap="round" stroke-width="1.5" d="M3 21c0-3.5 2.5-6 6-6"></path>
-                        <path stroke-linecap="round" stroke-width="1.5" d="M15 12v8M12 17h6"></path>
-                    </svg>
+        <path
+            stroke-linecap="round"
+            stroke-width="1.5"
+            d="M15 12v8M12 17h6"
+        ></path>
+    </svg>
 
-                    <span>Kelola Panduan</span>
-                </a>
+    <span>Kelola Panduan</span>
+</a>
             </div>
 
             <!-- PROFILE-->
@@ -451,7 +473,7 @@
                 </a>
             </div>
 
-            <!-- SISTEM -->
+            <!-- SISTEM
             <div class="mt-[18px]">
                 <div class="section-title px-[16px] mb-[5px] text-[14px] text-gray-500 font-normal">
                     Sistem
@@ -473,7 +495,7 @@
 
                     <span>Periode</span>
                 </a>
-            </div>
+            </div> -->
         </div>
 
 

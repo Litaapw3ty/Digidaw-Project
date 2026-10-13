@@ -82,7 +82,7 @@
 
                     <div class="flex items-center gap-3 shrink-0">
                         <span class="px-3.5 py-1 rounded-full bg-white/50 text-[#247c7b] text-sm font-semibold">
-                            Bobot : {{ $item['bobot'] }}
+                             Bobot : {{ number_format($item['bobot'] * 100, 0) }}%
                         </span>
                         <span class="px-3.5 py-1 rounded-full bg-white/50 text-[#247c7b] text-sm font-semibold">
                             Progres : {{ $item['progres'] }}

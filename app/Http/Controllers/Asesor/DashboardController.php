@@ -46,48 +46,71 @@ class DashboardController extends Controller
 
 
         // =========================================================
-        // 3. QUERY TUGAS VERIFIKASI
-        // =========================================================
-        $query = DB::table('dokumen_bukti as db')
-            ->join(
-                'evaluasi_data_dukung as edd',
-                'db.id_evaluasi_data_dukung',
-                '=',
-                'edd.id_evaluasi_data_dukung'
-            )
-            ->join(
-                'evaluasi_indikator as ei',
-                'edd.id_evaluasi_indikator',
-                '=',
-                'ei.id_evaluasi_indikator'
-            )
-            ->join(
-                'evaluasi as e',
-                'ei.id_evaluasi',
-                '=',
-                'e.id_evaluasi'
-            )
-            ->join(
-                'instansi as i',
-                'e.id_instansi',
-                '=',
-                'i.id_instansi'
-            )
-            ->join(
-                'indikator_penilaian as ip',
-                'ei.id_indikator',
-                '=',
-                'ip.id_indikator'
-            )
-            ->where('e.id_asesor', $idAsesor)
-            ->select(
-                'db.id_dokumen',
-                'i.nama_instansi',
-                'ip.kode_indikator',
-                'ip.nama_indikator',
-                'db.created_at',
-                'ei.status_pengisian'
-            );
+// 3. QUERY TUGAS VERIFIKASI
+// =========================================================
+$query = DB::table('dokumen_bukti as db')
+    ->join(
+        'evaluasi_data_dukung as edd',
+        'db.id_evaluasi_data_dukung',
+        '=',
+        'edd.id_evaluasi_data_dukung'
+    )
+    ->join(
+        'evaluasi_indikator as ei',
+        'edd.id_evaluasi_indikator',
+        '=',
+        'ei.id_evaluasi_indikator'
+    )
+    ->join(
+        'evaluasi as e',
+        'ei.id_evaluasi',
+        '=',
+        'e.id_evaluasi'
+    )
+    ->join(
+        'instansi as i',
+        'e.id_instansi',
+        '=',
+        'i.id_instansi'
+    )
+    ->join(
+        'indikator_penilaian as ip',
+        'ei.id_indikator',
+        '=',
+        'ip.id_indikator'
+    )
+    ->leftJoin(
+        'verifikasi_bukti as vb',
+        'db.id_dokumen',
+        '=',
+        'vb.id_dokumen'
+    )
+    ->where('e.id_asesor', $idAsesor)
+    ->where('db.status', 'AKTIF')
+    ->where(function ($q) {
+
+        // Dokumen baru yang belum diverifikasi
+        $q->whereNull('vb.id_verifikasi')
+
+        // ATAU dokumen yang sebelumnya perlu diperbaiki
+        ->orWhere('vb.keputusan', 'PERLU_PERBAIKAN');
+
+    })
+    ->select(
+        'db.id_dokumen',
+        'db.id_evaluasi_data_dukung',
+        'edd.id_data_dukung',
+        'e.id_instansi',
+        'i.nama_instansi',
+        'ip.id_indikator',
+        'ip.nomor_indikator',
+        'ip.kode_indikator',
+        'ip.nama_indikator',
+        'db.created_at',
+        'ei.status_pengisian',
+        'edd.status as status_data_dukung',
+        'vb.keputusan as keputusan_verifikasi'
+    );
 
 
         // =========================================================

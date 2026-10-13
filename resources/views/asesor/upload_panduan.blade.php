@@ -2,34 +2,348 @@
 
 @section('content')
 
-<div class="w-full space-y-6">
+<style>
+    .panduan-page {
+        --card: #ffffff;
+        --soft: #f8fafc;
+        --soft-2: #f1f5f9;
+        --text: #172033;
+        --text-2: #334155;
+        --muted: #64748b;
+        --line: rgba(15, 23, 42, .07);
 
-    {{-- Header --}}
+        --accent: #12a89d;
+        --accent-hover: #0e8d84;
+        --accent-soft: rgba(18, 168, 157, .08);
+    }
 
-    <div>
-        <h1 class="text-3xl font-bold theme-title tracking-tight">
-            Upload Panduan & Template
-        </h1>
+    body.dark-mode .panduan-page {
+        --card: #171e27;
+        --soft: #1b2430;
+        --soft-2: #202b38;
+        --text: #f1f5f9;
+        --text-2: #cbd5e1;
+        --muted: #94a3b8;
+        --line: rgba(255,255,255,.08);
 
-        <p class="text-lg font-normal theme-muted mt-1.5">
-            Tambahkan panduan atau template yang dapat digunakan sebagai referensi dalam proses penilaian.
-        </p>
+        --accent: #20b8aa;
+        --accent-hover: #2bc7b8;
+        --accent-soft: rgba(32,184,170,.10);
+    }
+
+    .panduan-page {
+        color: var(--text);
+    }
+
+    .p-card {
+        background: var(--card);
+        color: var(--text);
+    }
+
+    .p-soft {
+        background: var(--soft);
+        color: var(--text);
+    }
+
+    .p-text {
+        color: var(--text) !important;
+    }
+
+    .p-text-2 {
+        color: var(--text-2) !important;
+    }
+
+    .p-muted {
+        color: var(--muted) !important;
+    }
+
+    .p-accent {
+        color: var(--accent) !important;
+    }
+
+    .p-accent-bg {
+        background: var(--accent-soft);
+    }
+
+    .p-main-card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 1rem;
+        box-shadow:
+            0 1px 2px rgba(15,23,42,.025),
+            0 8px 24px rgba(15,23,42,.025);
+    }
+
+    body.dark-mode .p-main-card {
+        box-shadow:
+            0 1px 2px rgba(0,0,0,.15),
+            0 8px 24px rgba(0,0,0,.12);
+    }
+
+    .p-divider {
+        height: 1px;
+        background: var(--line);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | INPUT
+    |--------------------------------------------------------------------------
+    */
+
+    .p-input {
+        width: 100%;
+        background: var(--card);
+        color: var(--text) !important;
+        border: 1px solid var(--line);
+        border-radius: .7rem;
+        transition: .2s ease;
+    }
+
+    .p-input::placeholder {
+        color: var(--muted) !important;
+        opacity: 1;
+    }
+
+    .p-input:focus {
+        outline: none;
+        border-color: rgba(18,168,157,.45);
+        box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | RADIO
+    |--------------------------------------------------------------------------
+    */
+
+    .panduan-radio {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .panduan-radio-card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: .8rem;
+        transition: .2s ease;
+    }
+
+    .panduan-radio-card:hover {
+        background: var(--soft);
+    }
+
+    .panduan-radio:checked + .panduan-radio-card {
+        background: var(--accent-soft);
+        border-color: rgba(18,168,157,.4);
+        box-shadow: 0 0 0 2px var(--accent-soft);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | DATA DUKUNG
+    |--------------------------------------------------------------------------
+    */
+
+    .data-dukung-box {
+        position: relative;
+        overflow: hidden;
+        background: #ffffff;
+        border: 1px solid rgba(15,23,42,.06);
+        border-radius: .8rem;
+        box-shadow: 0 2px 8px rgba(15,23,42,.025);
+    }
+
+    .data-dukung-box::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: var(--accent);
+    }
+
+    body.dark-mode .data-dukung-box {
+        background: #1b2430;
+        border-color: rgba(255,255,255,.06);
+        box-shadow: none;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | UPLOAD
+    |--------------------------------------------------------------------------
+    */
+
+    .panduan-upload {
+        background: var(--soft);
+        border: 1px dashed rgba(100,116,139,.22);
+        border-radius: .85rem;
+        transition: .2s ease;
+    }
+
+    .panduan-upload:hover {
+        background: var(--accent-soft);
+        border-color: rgba(18,168,157,.45);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | FILE
+    |--------------------------------------------------------------------------
+    */
+
+    .file-item {
+        background: var(--soft);
+        border-radius: .75rem;
+        transition: .2s ease;
+    }
+
+    .file-item:hover {
+        background: var(--soft-2);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | BUTTON
+    |--------------------------------------------------------------------------
+    */
+
+    .p-btn-primary {
+        background: var(--accent);
+        color: #ffffff !important;
+        transition: .2s ease;
+    }
+
+    .p-btn-primary:hover {
+        background: var(--accent-hover);
+    }
+
+    .p-btn-secondary {
+        background: transparent;
+        color: var(--text-2) !important;
+        border: 1px solid var(--line);
+        transition: .2s ease;
+    }
+
+    .p-btn-secondary:hover {
+        background: var(--soft);
+        color: var(--text) !important;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | SEARCH
+    |--------------------------------------------------------------------------
+    */
+
+    .panduan-search {
+        background: var(--soft);
+        color: var(--text) !important;
+        border: 1px solid transparent;
+    }
+
+    .panduan-search::placeholder {
+        color: var(--muted);
+    }
+
+    .panduan-search:focus {
+        background: var(--card);
+        border-color: rgba(18,168,157,.35);
+        outline: none;
+        box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | SCROLL
+    |--------------------------------------------------------------------------
+    */
+
+    .panduan-scroll {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(100,116,139,.25) transparent;
+    }
+
+    .panduan-scroll::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .panduan-scroll::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .panduan-scroll::-webkit-scrollbar-thumb {
+        background: rgba(100,116,139,.25);
+        border-radius: 999px;
+    }
+</style>
+
+
+<div class="panduan-page w-full space-y-5">
+
+
+    {{-- =========================================================
+        HEADER
+    ========================================================== --}}
+
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+        <div class="flex items-center gap-3">
+
+            <div class="p-accent-bg flex h-11 w-11 shrink-0 items-center justify-center rounded-xl">
+                <i class="fa-solid fa-book-open p-accent"></i>
+            </div>
+
+            <div>
+
+                <h1 class="p-text text-[25px] font-bold tracking-tight">
+                    {{ $editPanduan ? 'Edit Panduan & Template' : 'Upload Panduan & Template' }}
+                </h1>
+
+                <p class="p-muted mt-1 text-[13px]">
+                    Kelola dokumen referensi untuk mendukung proses penilaian.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <a
+            href="{{ url('/asesor/kelola_panduan') }}"
+            class="p-btn-secondary inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-[12px] font-semibold"
+        >
+
+            <i class="fa-solid fa-arrow-left text-[10px]"></i>
+
+            Kembali
+
+        </a>
+
     </div>
 
 
-    {{-- Success Message --}}
+
+    {{-- =========================================================
+        SUCCESS
+    ========================================================== --}}
 
     @if(session('success'))
 
-        <div class="theme-card border theme-border rounded-xl px-4 py-3">
+        <div class="p-card rounded-xl px-4 py-3 shadow-sm">
 
             <div class="flex items-center gap-3">
 
-                <div class="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-950/50 text-green-600 dark:text-green-400 flex items-center justify-center">
-                    <i class="fa-solid fa-check"></i>
+                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+
+                    <i class="fa-solid fa-check text-xs"></i>
+
                 </div>
 
-                <p class="text-sm font-medium text-green-700 dark:text-green-400">
+                <p class="text-[13px] font-medium text-emerald-700">
                     {{ session('success') }}
                 </p>
 
@@ -40,31 +354,34 @@
     @endif
 
 
-    {{-- Validation Error --}}
+
+    {{-- =========================================================
+        ERROR
+    ========================================================== --}}
 
     @if($errors->any())
 
-        <div class="theme-card border border-red-200 dark:border-red-900/60 rounded-xl px-4 py-3">
+        <div class="p-card rounded-xl px-4 py-3 shadow-sm">
 
             <div class="flex items-start gap-3">
 
-                <div class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-950/50 text-red-600 dark:text-red-400 flex items-center justify-center flex-shrink-0">
-                    <i class="fa-solid fa-exclamation"></i>
+                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-600">
+
+                    <i class="fa-solid fa-exclamation text-xs"></i>
+
                 </div>
 
                 <div>
 
-                    <p class="text-sm font-semibold text-red-700 dark:text-red-400 mb-1">
+                    <p class="text-[13px] font-semibold text-red-700">
                         Terjadi kesalahan
                     </p>
 
-                    <ul class="text-xs text-red-600 dark:text-red-300 space-y-1">
+                    <ul class="mt-1.5 space-y-1 text-[12px] text-red-600">
 
                         @foreach($errors->all() as $error)
 
-                            <li>
-                                {{ $error }}
-                            </li>
+                            <li>{{ $error }}</li>
 
                         @endforeach
 
@@ -79,406 +396,699 @@
     @endif
 
 
-    {{-- Content --}}
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    {{-- =========================================================
+        MAIN CONTENT
+    ========================================================== --}}
+
+    <div class="grid grid-cols-1 items-start gap-5 xl:grid-cols-3">
 
 
-        {{-- ============================================= --}}
-        {{-- FORM UTAMA --}}
-        {{-- ============================================= --}}
+        {{-- =====================================================
+            FORM
+        ====================================================== --}}
 
-        <div class="lg:col-span-2 theme-card border theme-border rounded-2xl p-6 shadow-sm">
+        <div class="p-main-card overflow-hidden xl:col-span-2">
 
-            <div class="flex items-center gap-3 pb-4 border-b theme-border">
 
-                <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+            {{-- HEADER --}}
 
-                    <i class="fa-regular fa-file-lines text-lg"></i>
+            <div class="px-6 py-5">
 
-                </div>
+                <div class="flex items-center gap-3">
 
-                <div>
+                    <div class="p-accent-bg flex h-9 w-9 items-center justify-center rounded-lg">
 
-                    <h2 class="font-bold theme-title text-base">
-                        {{ $editPanduan ? 'Edit Panduan & Template' : 'Detail Panduan & Template' }}
-                    </h2>
+                        <i class="fa-regular fa-file-lines p-accent text-sm"></i>
 
-                    <p class="text-xs theme-muted mt-0.5">
-                        {{ $editPanduan ? 'Perbarui informasi atau file dokumen.' : 'Lengkapi informasi dokumen yang akan ditambahkan.' }}
-                    </p>
+                    </div>
+
+                    <div>
+
+                        <h2 class="p-text text-[15px] font-bold">
+                            Informasi Dokumen
+                        </h2>
+
+                        <p class="p-muted mt-0.5 text-[12px]">
+                            {{ $editPanduan
+                                ? 'Perbarui informasi dan file dokumen.'
+                                : 'Lengkapi informasi dokumen yang akan ditambahkan.'
+                            }}
+                        </p>
+
+                    </div>
+
+
+                    @if($editPanduan)
+
+                        <span class="ml-auto rounded-md bg-amber-50 px-2.5 py-1 text-[10px] font-bold text-amber-700">
+
+                            <i class="fa-solid fa-pen mr-1 text-[8px]"></i>
+
+                            MODE EDIT
+
+                        </span>
+
+                    @endif
 
                 </div>
 
             </div>
 
 
+            <div class="p-divider"></div>
+
+
+
+            {{-- FORM --}}
+
             <form
                 action="{{ route('asesor.panduan.store') }}"
                 method="POST"
                 enctype="multipart/form-data"
-                class="space-y-5 mt-6"
+                class="space-y-6 p-6"
             >
 
                 @csrf
 
+
                 @if($editPanduan)
-                    <input type="hidden" name="edit_id" value="{{ $editPanduan->id_panduan }}">
-                @endif
-
-
-                {{-- Aspek & Indikator --}}
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-
-                    {{-- Aspek --}}
-
-                    <div>
-
-                        <label class="block text-xs font-semibold theme-title mb-1.5">
-
-                            Aspek Penilaian
-
-                            <span class="text-red-500">*</span>
-
-                        </label>
-
-                        <div class="theme-input w-full rounded-lg px-3 py-2.5 text-sm">
-
-                            Aspek {{ $aspek->nomor_aspek }}
-                            :
-                            {{ $aspek->nama_aspek }}
-
-                        </div>
-
-                        <input
-                            type="hidden"
-                            name="id_aspek"
-                            value="{{ $aspek->id_aspek }}"
-                        >
-
-                    </div>
-
-
-                    {{-- Indikator --}}
-
-                    <div>
-
-                        <label class="block text-xs font-semibold theme-title mb-1.5">
-
-                            Indikator Terkait
-
-                            <span class="text-red-500">*</span>
-
-                        </label>
-
-                        <div class="theme-input w-full rounded-lg px-3 py-2.5 text-sm">
-
-                            Indikator {{ $indikator->nomor_indikator }}
-                            :
-                            {{ $indikator->nama_indikator }}
-
-                        </div>
-
-                        <input
-                            type="hidden"
-                            name="id_indikator"
-                            value="{{ $indikator->id_indikator }}"
-                        >
-
-                        <input
-                            type="hidden"
-                            name="id_data_dukung"
-                            value="{{ $dataDukung->id_data_dukung }}"
-                        >
-
-                    </div>
-
-                </div>
-
-                @if($dataDukung)
-                    <div class="rounded-lg border border-teal-200 bg-teal-50/70 px-3 py-2.5 dark:border-teal-900/60 dark:bg-teal-950/20">
-                        <p class="text-[10px] font-semibold uppercase tracking-wide text-teal-700 dark:text-teal-300">
-                            Detail data dukung yang dipilih
-                        </p>
-                        <p class="mt-1 text-sm font-semibold theme-title">
-                            {{ $dataDukung->nama_data_dukung }}
-                        </p>
-                        @if($dataDukung->deskripsi)
-                            <p class="mt-0.5 text-xs theme-muted">
-                                {{ $dataDukung->deskripsi }}
-                            </p>
-                        @endif
-                    </div>
-                @endif
-
-
-                {{-- Judul --}}
-
-                <div>
-
-                    <label class="block text-xs font-semibold theme-title mb-1.5">
-
-                        Judul Panduan / Template
-
-                        <span class="text-red-500">*</span>
-
-                    </label>
 
                     <input
-                        type="text"
-                        name="judul"
-                        value="{{ old('judul', $editPanduan->judul ?? ($dataDukung->nama_data_dukung ?? '')) }}"
-                        required
-                        maxlength="255"
-                        class="theme-input w-full rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20"
-                        placeholder="{{ $dataDukung->nama_data_dukung }}"
+                        type="hidden"
+                        name="edit_id"
+                        value="{{ $editPanduan->id_panduan }}"
                     >
 
-                </div>
+                @endif
 
 
-                {{-- Tipe --}}
 
-                <div>
+                {{-- =================================================
+                    01
+                ================================================== --}}
 
-                    <label class="block text-xs font-semibold theme-title mb-1.5">
+                <section>
 
-                        Jenis Dokumen
+                    <div class="mb-4 flex items-center gap-2.5">
 
-                        <span class="text-red-500">*</span>
+                        <div class="p-accent-bg flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[10px] font-extrabold p-accent">
+                            01
+                        </div>
 
-                    </label>
+                        <div>
 
+                            <h3 class="p-text text-[14px] font-bold">
+                                Informasi Penilaian
+                            </h3>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <p class="p-muted mt-0.5 text-[11px]">
+                                Konteks penilaian yang terkait dengan dokumen.
+                            </p>
 
-
-                        {{-- Panduan --}}
-
-                        <label class="cursor-pointer">
-
-                            <input
-                                type="radio"
-                                name="tipe"
-                                value="PANDUAN"
-                                class="peer hidden radio-tipe"
-                                {{ old('tipe', $editPanduan?->tipe ?? ($defaultTipe ?? '')) === 'PANDUAN' ? 'checked' : '' }}
-                                {{ $hasPanduan && !$editPanduan ? 'disabled' : '' }}
-                            >
-
-                            <div class="relative theme-card border theme-border rounded-xl p-3 transition-all duration-200
-                                {{ $hasPanduan && !$editPanduan
-                                    ? 'opacity-50 cursor-not-allowed border-red-200 dark:border-red-900/50'
-                                    : 'peer-checked:border-[#12a89d] peer-checked:border-2 peer-checked:bg-[#12a89d]/10 dark:peer-checked:bg-[#14b8a6]/20 peer-checked:ring-2 peer-checked:ring-[#12a89d]/20 peer-checked:scale-[1.02]' }}">
-
-                                <div class="absolute top-2 right-2 hidden peer-checked:flex items-center justify-center w-5 h-5 rounded-full bg-[#12a89d] text-white dark:bg-[#14b8a6]">
-                                    <i class="fa-solid fa-check text-[10px]"></i>
-                                </div>
-
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 rounded-lg bg-[#12a89d]/10 text-[#12a89d] dark:bg-[#14b8a6]/20 dark:text-[#14b8a6] flex items-center justify-center">
-                                        <i class="fa-regular fa-file-pdf"></i>
-                                    </div>
-
-                                    <div>
-                                        <p class="text-xs font-semibold theme-title">Panduan</p>
-                                        <p class="text-[10px] theme-muted">PDF</p>
-
-                                        @if($hasPanduan && !$editPanduan)
-                                            <p class="text-[10px] text-red-500 dark:text-red-400 mt-1 font-medium">
-                                                Sudah diupload
-                                            </p>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-
-                        </label>
-
-
-                        {{-- Template --}}
-
-                        <label class="cursor-pointer">
-
-                            <input
-                                type="radio"
-                                name="tipe"
-                                value="TEMPLATE"
-                                class="peer hidden radio-tipe"
-                                {{ old('tipe', $editPanduan?->tipe ?? ($defaultTipe ?? '')) === 'TEMPLATE' ? 'checked' : '' }}
-                                {{ $hasTemplate && !$editPanduan ? 'disabled' : '' }}
-                            >
-
-                            <div class="relative theme-card border theme-border rounded-xl p-3 transition-all duration-200
-                                {{ $hasTemplate && !$editPanduan
-                                    ? 'opacity-50 cursor-not-allowed border-red-200 dark:border-red-900/50'
-                                    : 'peer-checked:border-[#12a89d] peer-checked:border-2 peer-checked:bg-[#12a89d]/10 dark:peer-checked:bg-[#14b8a6]/20 peer-checked:ring-2 peer-checked:ring-[#12a89d]/20 peer-checked:scale-[1.02]' }}">
-
-                                <div class="absolute top-2 right-2 hidden peer-checked:flex items-center justify-center w-5 h-5 rounded-full bg-[#12a89d] text-white dark:bg-[#14b8a6]">
-                                    <i class="fa-solid fa-check text-[10px]"></i>
-                                </div>
-
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 rounded-lg bg-[#12a89d]/10 text-[#12a89d] dark:bg-[#14b8a6]/20 dark:text-[#14b8a6] flex items-center justify-center">
-                                        <i class="fa-regular fa-file-word"></i>
-                                    </div>
-
-                                    <div>
-                                        <p class="text-xs font-semibold theme-title">Template</p>
-                                        <p class="text-[10px] theme-muted">Word / Excel</p>
-
-                                        @if($hasTemplate && !$editPanduan)
-                                            <p class="text-[10px] text-red-500 dark:text-red-400 mt-1 font-medium">
-                                                Sudah diupload
-                                            </p>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-
-                        </label>
+                        </div>
 
                     </div>
 
-                </div>
 
 
-                {{-- BLOK PREVIEW SEMUA DOKUMEN YANG SUDAH DIUPLOAD PER DATA DUKUNG --}}
-                @php
-                    $existingFiles = $panduanList->where('id_data_dukung', $dataDukung->id_data_dukung);
-                    $bothUploaded = $hasPanduan && $hasTemplate && !$editPanduan;
-                @endphp
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 
-                @if($existingFiles->count() > 0)
-                    <div class="rounded-xl border theme-border bg-gray-50/50 p-4 dark:bg-white/5 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold theme-title flex items-center gap-1.5">
-                                <i class="fa-solid fa-paperclip text-teal-600"></i> File Terpasang Saat Ini ({{ $existingFiles->count() }})
-                            </span>
+
+                        {{-- ASPEK --}}
+
+                        <div>
+
+                            <label class="p-text mb-1.5 block text-[12px] font-semibold">
+
+                                Aspek Penilaian
+
+                                <span class="text-red-500">*</span>
+
+                            </label>
+
+
+                            <div class="p-soft rounded-lg px-3.5 py-3 text-[12px]">
+
+                                <span class="p-text font-semibold">
+                                    Aspek {{ $aspek->nomor_aspek }}
+                                </span>
+
+                                <span class="p-muted">
+                                    — {{ $aspek->nama_aspek }}
+                                </span>
+
+                            </div>
+
+
+                            <input
+                                type="hidden"
+                                name="id_aspek"
+                                value="{{ $aspek->id_aspek }}"
+                            >
+
                         </div>
 
-                        <div class="space-y-2">
-                            @foreach($existingFiles as $itemFile)
-                                <div class="flex items-center justify-between gap-3 bg-white p-3 rounded-lg border theme-border dark:bg-gray-800">
-                                    <div class="flex items-center gap-3 min-w-0">
-                                        @php
-                                            $ext = strtolower(pathinfo($itemFile->file_name ?? '', PATHINFO_EXTENSION));
-                                        @endphp
-                                        <div class="w-9 h-9 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 border border-teal-200">
-                                            @if($ext === 'pdf')
-                                                <i class="fa-regular fa-file-pdf text-red-500 text-base"></i>
-                                            @elseif(in_array($ext, ['doc', 'docx']))
-                                                <i class="fa-regular fa-file-word text-blue-500 text-base"></i>
-                                            @elseif(in_array($ext, ['xls', 'xlsx']))
-                                                <i class="fa-regular fa-file-excel text-green-500 text-base"></i>
-                                            @else
-                                                <i class="fa-regular fa-file text-base"></i>
-                                            @endif
+
+
+                        {{-- INDIKATOR --}}
+
+                        <div>
+
+                            <label class="p-text mb-1.5 block text-[12px] font-semibold">
+
+                                Indikator Terkait
+
+                                <span class="text-red-500">*</span>
+
+                            </label>
+
+
+                            <div class="p-soft rounded-lg px-3.5 py-3 text-[12px]">
+
+                                <span class="p-text font-semibold">
+                                    Indikator {{ $indikator->nomor_indikator }}
+                                </span>
+
+                                <span class="p-muted">
+                                    — {{ $indikator->nama_indikator }}
+                                </span>
+
+                            </div>
+
+
+                            <input
+                                type="hidden"
+                                name="id_indikator"
+                                value="{{ $indikator->id_indikator }}"
+                            >
+
+                            @if($dataDukung)
+
+                                <input
+                                    type="hidden"
+                                    name="id_data_dukung"
+                                    value="{{ $dataDukung->id_data_dukung }}"
+                                >
+
+                            @endif
+
+                        </div>
+
+                    </div>
+
+
+
+                    {{-- DATA DUKUNG --}}
+
+                    @if($dataDukung)
+
+                        <div class="data-dukung-box mt-4 p-4">
+
+                            <div class="flex items-start gap-3">
+
+                                <div class="p-accent-bg flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
+
+                                    <i class="fa-solid fa-layer-group p-accent text-sm"></i>
+
+                                </div>
+
+
+                                <div class="min-w-0">
+
+                                    <p class="p-accent text-[10px] font-bold uppercase tracking-[.08em]">
+                                        Data Dukung
+                                    </p>
+
+                                    <p class="p-text mt-1 text-[14px] font-semibold leading-snug">
+                                        {{ $dataDukung->nama_data_dukung }}
+                                    </p>
+
+
+                                    @if($dataDukung->deskripsi)
+
+                                        <p class="p-text-2 mt-1.5 text-[12px] leading-relaxed">
+                                            {{ $dataDukung->deskripsi }}
+                                        </p>
+
+                                    @endif
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    @endif
+
+                </section>
+
+
+
+                <div class="p-divider"></div>
+
+
+
+                {{-- =================================================
+                    02
+                ================================================== --}}
+
+                <section>
+
+                    <div class="mb-4 flex items-center gap-2.5">
+
+                        <div class="p-accent-bg flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[10px] font-extrabold p-accent">
+                            02
+                        </div>
+
+                        <div>
+
+                            <h3 class="p-text text-[14px] font-bold">
+                                Detail Dokumen
+                            </h3>
+
+                            <p class="p-muted mt-0.5 text-[11px]">
+                                Tentukan nama dan jenis dokumen.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    {{-- JUDUL --}}
+
+                    <div class="mb-5">
+
+                        <label class="p-text mb-1.5 block text-[12px] font-semibold">
+
+                            Judul Panduan / Template
+
+                            <span class="text-red-500">*</span>
+
+                        </label>
+
+
+                        <input
+                            type="text"
+                            name="judul"
+                            value="{{ old('judul', $editPanduan->judul ?? ($dataDukung->nama_data_dukung ?? '')) }}"
+                            required
+                            maxlength="255"
+                            class="p-input px-3.5 py-3 text-[12px]"
+                            placeholder="{{ $dataDukung->nama_data_dukung }}"
+                        >
+
+                    </div>
+
+
+
+                    {{-- TIPE --}}
+
+                    <div>
+
+                        <label class="p-text mb-2 block text-[12px] font-semibold">
+
+                            Jenis Dokumen
+
+                            <span class="text-red-500">*</span>
+
+                        </label>
+
+
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+
+
+                            {{-- PANDUAN --}}
+
+                            <label class="relative block cursor-pointer">
+
+                                <input
+                                    type="radio"
+                                    name="tipe"
+                                    value="PANDUAN"
+                                    class="panduan-radio"
+                                    {{ old('tipe', $editPanduan?->tipe ?? ($defaultTipe ?? '')) === 'PANDUAN' ? 'checked' : '' }}
+                                    {{ $hasPanduan && !$editPanduan ? 'disabled' : '' }}
+                                >
+
+
+                                <div class="panduan-radio-card p-4">
+
+                                    <div class="flex items-center gap-3">
+
+                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-500">
+
+                                            <i class="fa-regular fa-file-pdf"></i>
+
                                         </div>
+
+
                                         <div class="min-w-0">
-                                            <div class="flex items-center gap-2">
-                                                <p class="text-xs font-semibold theme-title truncate">
-                                                    {{ $itemFile->file_name ?? $itemFile->judul }}
-                                                </p>
-                                                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase shrink-0
-                                                    bg-[#f6c400]/15 text-[#d4a200]
-                                                    dark:bg-[#f6c400]/20 dark:text-[#f6c400]">
-                                                    {{ $itemFile->tipe }}
-                                                </span>
-                                            </div>
-                                            <p class="text-[10px] theme-muted mt-0.5">
-                                                Format: {{ strtoupper($ext ?: 'FILE') }}
+
+                                            <p class="p-text text-[13px] font-bold">
+                                                Panduan
                                             </p>
+
+                                            <p class="p-muted mt-0.5 text-[11px]">
+                                                Dokumen panduan penggunaan
+                                            </p>
+
+
+                                            @if($hasPanduan && !$editPanduan)
+
+                                                <span class="mt-1.5 inline-flex items-center gap-1 text-[10px] font-semibold text-red-500">
+
+                                                    <i class="fa-solid fa-circle-check text-[8px]"></i>
+
+                                                    Sudah diupload
+
+                                                </span>
+
+                                            @endif
+
                                         </div>
+
                                     </div>
 
-                                    {{-- TOMBOL AKSI TERHADAP FILE --}}
-                                    <div class="flex items-center gap-2 shrink-0">
+                                </div>
+
+                            </label>
+
+
+
+                            {{-- TEMPLATE --}}
+
+                            <label class="relative block cursor-pointer">
+
+                                <input
+                                    type="radio"
+                                    name="tipe"
+                                    value="TEMPLATE"
+                                    class="panduan-radio"
+                                    {{ old('tipe', $editPanduan?->tipe ?? ($defaultTipe ?? '')) === 'TEMPLATE' ? 'checked' : '' }}
+                                    {{ $hasTemplate && !$editPanduan ? 'disabled' : '' }}
+                                >
+
+
+                                <div class="panduan-radio-card p-4">
+
+                                    <div class="flex items-center gap-3">
+
+                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-500">
+
+                                            <i class="fa-regular fa-file-word"></i>
+
+                                        </div>
+
+
+                                        <div class="min-w-0">
+
+                                            <p class="p-text text-[13px] font-bold">
+                                                Template
+                                            </p>
+
+                                            <p class="p-muted mt-0.5 text-[11px]">
+                                                Word atau Excel yang dapat digunakan
+                                            </p>
+
+
+                                            @if($hasTemplate && !$editPanduan)
+
+                                                <span class="mt-1.5 inline-flex items-center gap-1 text-[10px] font-semibold text-red-500">
+
+                                                    <i class="fa-solid fa-circle-check text-[8px]"></i>
+
+                                                    Sudah diupload
+
+                                                </span>
+
+                                            @endif
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+
+                {{-- =================================================
+                    EXISTING FILE
+                ================================================== --}}
+
+                @php
+
+                    $existingFiles = $panduanList->where(
+                        'id_data_dukung',
+                        $dataDukung->id_data_dukung
+                    );
+
+                    $bothUploaded = $hasPanduan && $hasTemplate && !$editPanduan;
+
+                @endphp
+
+
+                @if($existingFiles->count() > 0)
+
+                    <div class="p-soft rounded-xl p-4">
+
+                        <div class="mb-3 flex items-center justify-between gap-3">
+
+                            <div class="flex items-center gap-2.5">
+
+                                <div class="p-accent-bg flex h-8 w-8 items-center justify-center rounded-lg">
+
+                                    <i class="fa-solid fa-paperclip p-accent text-xs"></i>
+
+                                </div>
+
+
+                                <div>
+
+                                    <p class="p-text text-[13px] font-bold">
+                                        File Terpasang
+                                    </p>
+
+                                    <p class="p-muted mt-0.5 text-[11px]">
+                                        Dokumen yang sudah tersedia
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <span class="rounded-md bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-600">
+
+                                {{ $existingFiles->count() }} File
+
+                            </span>
+
+                        </div>
+
+
+
+                        <div class="space-y-2">
+
+                            @foreach($existingFiles as $itemFile)
+
+                                @php
+
+                                    $ext = strtolower(
+                                        pathinfo(
+                                            $itemFile->file_name ?? '',
+                                            PATHINFO_EXTENSION
+                                        )
+                                    );
+
+                                @endphp
+
+
+                                <div class="file-item flex items-center justify-between gap-3 p-3">
+
+                                    <div class="flex min-w-0 items-center gap-3">
+
+                                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white dark:bg-white/5">
+
+                                            @if($ext === 'pdf')
+
+                                                <i class="fa-regular fa-file-pdf text-red-500"></i>
+
+                                            @elseif(in_array($ext, ['doc', 'docx']))
+
+                                                <i class="fa-regular fa-file-word text-blue-500"></i>
+
+                                            @elseif(in_array($ext, ['xls', 'xlsx']))
+
+                                                <i class="fa-regular fa-file-excel text-green-500"></i>
+
+                                            @else
+
+                                                <i class="fa-regular fa-file p-muted"></i>
+
+                                            @endif
+
+                                        </div>
+
+
+                                        <div class="min-w-0">
+
+                                            <div class="flex items-center gap-2">
+
+                                                <p class="p-text truncate text-[12px] font-semibold">
+                                                    {{ $itemFile->file_name ?? $itemFile->judul }}
+                                                </p>
+
+                                                <span class="shrink-0 rounded bg-amber-50 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-700">
+                                                    {{ $itemFile->tipe }}
+                                                </span>
+
+                                            </div>
+
+                                            <p class="p-muted mt-0.5 text-[10px] uppercase">
+                                                {{ $ext ?: 'FILE' }}
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+
+
+                                    <div class="flex shrink-0 items-center gap-1.5">
+
                                         @if($itemFile->file_exists && $itemFile->file_url)
+
                                             <a
                                                 href="{{ route('asesor.panduan.file', ['id' => $itemFile->id_panduan]) }}"
                                                 target="_blank"
-                                                class="px-2.5 py-1.5 rounded-md bg-[#12a89d]/10 text-[#12a89d] hover:bg-[#12a89d]/20 dark:bg-[#14b8a6]/20 dark:text-[#14b8a6] dark:hover:bg-[#14b8a6]/30 text-xs font-semibold transition inline-flex items-center gap-1"
+                                                title="Lihat file"
+                                                class="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-50 text-teal-600 transition hover:bg-teal-100"
                                             >
-                                                <i class="fa-regular fa-eye"></i> Lihat
+                                                <i class="fa-regular fa-eye text-xs"></i>
                                             </a>
+
                                         @endif
 
+
                                         <a
-                                            href="{{ route('asesor.panduan.upload', ['idAspek' => $aspek->id_aspek, 'idIndikator' => $indikator->id_indikator, 'idDataDukung' => $dataDukung->id_data_dukung, 'edit' => $itemFile->id_panduan]) }}"
-                                            class="px-2.5 py-1.5 rounded-md bg-[#12a89d]/10 text-[#12a89d] hover:bg-[#12a89d]/20 dark:bg-[#14b8a6]/20 dark:text-[#14b8a6] dark:hover:bg-[#14b8a6]/30 text-xs font-semibold transition inline-flex items-center gap-1"
+                                            href="{{ route('asesor.panduan.upload', [
+                                                'idAspek' => $aspek->id_aspek,
+                                                'idIndikator' => $indikator->id_indikator,
+                                                'idDataDukung' => $dataDukung->id_data_dukung,
+                                                'edit' => $itemFile->id_panduan
+                                            ]) }}"
+                                            title="Edit file"
+                                            class="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600 transition hover:bg-slate-200"
                                         >
-                                            <i class="fa-regular fa-pen-to-square"></i> Edit
+                                            <i class="fa-regular fa-pen-to-square text-xs"></i>
                                         </a>
+
 
                                         <button
                                             type="button"
+                                            title="Hapus file"
                                             onclick="if(confirm('Hapus file {{ addslashes($itemFile->judul) }}?')) document.getElementById('delete-file-form-{{ $itemFile->id_panduan }}').submit();"
-                                            class="px-2.5 py-1.5 rounded-md bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500/20 text-xs font-semibold transition inline-flex items-center gap-1"
+                                            class="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-600 transition hover:bg-red-100"
                                         >
-                                            <i class="fa-regular fa-trash-can"></i> Hapus
+                                            <i class="fa-regular fa-trash-can text-xs"></i>
                                         </button>
+
                                     </div>
+
                                 </div>
+
                             @endforeach
+
                         </div>
+
                     </div>
+
                 @endif
 
 
-                {{-- Upload File --}}
 
-                <div>
+                {{-- =================================================
+                    03 FILE
+                ================================================== --}}
 
-                    <label class="block text-xs font-semibold theme-title mb-1.5">
+                <section>
 
-                        {{ $editPanduan ? 'Ganti File Dokumen (Opsional)' : 'File Dokumen' }}
+                    <div class="mb-3 flex items-center gap-2.5">
 
-                        @if(!$editPanduan)
-                            <span class="text-red-500">*</span>
-                        @endif
+                        <div class="p-accent-bg flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[10px] font-extrabold p-accent">
+                            03
+                        </div>
 
-                    </label>
+                        <div>
+
+                            <h3 class="p-text text-[14px] font-bold">
+                                File Dokumen
+                            </h3>
+
+                            <p class="p-muted mt-0.5 text-[11px]">
+                                Pilih file yang akan disimpan.
+                            </p>
+
+                        </div>
+
+                    </div>
+
 
 
                     <label
                         for="file"
                         id="upload-box"
-                        class="block border-2 border-dashed theme-border rounded-xl p-7 text-center transition
-                            {{ $bothUploaded ? 'bg-gray-100 dark:bg-gray-800/50 opacity-60 cursor-not-allowed border-gray-300' : 'cursor-pointer hover:border-teal-500' }}"
+                        class="panduan-upload block p-7 text-center {{ $bothUploaded ? 'cursor-not-allowed opacity-50' : 'cursor-pointer' }}"
                     >
 
                         <div
                             id="upload-icon"
-                            class="w-11 h-11 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3"
+                            class="p-accent-bg mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl"
                         >
 
-                            <i class="fa-regular fa-file-arrow-up text-lg"></i>
+                            <i class="fa-solid fa-cloud-arrow-up p-accent text-lg"></i>
 
                         </div>
 
 
                         <p
                             id="file-name"
-                            class="text-xs font-medium theme-title"
+                            class="p-text text-[13px] font-semibold"
                         >
+
                             @if($bothUploaded)
-                                Panduan & Template sudah lengkap diunggah. Hapus atau edit salah satu untuk mengganti file.
+
+                                Panduan & Template sudah lengkap
+
                             @elseif($editPanduan)
+
                                 {{ $editPanduan->file_name ?? 'Klik untuk mengganti file' }}
+
                             @else
+
                                 Pilih jenis dokumen terlebih dahulu
+
                             @endif
+
                         </p>
 
 
-                        <p class="text-[11px] theme-muted mt-1">
+                        <p class="p-muted mt-1.5 text-[11px]">
                             Maksimal ukuran 10MB
                         </p>
 
-                        <p class="text-[11px] theme-muted">
+                        <p class="p-muted text-[11px]">
                             PDF, DOC, DOCX, XLS, XLSX
                         </p>
 
@@ -495,99 +1105,141 @@
 
                     </label>
 
-                </div>
+                </section>
 
 
-                {{-- Deskripsi --}}
 
-                <div>
+                {{-- =================================================
+                    DESKRIPSI
+                ================================================== --}}
 
-                    <label class="block text-xs font-semibold theme-title mb-1.5">
+                <section>
 
+                    <label class="p-text mb-1.5 block text-[12px] font-semibold">
                         Instruksi Tambahan / Deskripsi
-
                     </label>
 
 
                     <textarea
                         name="deskripsi"
                         rows="4"
-                        class="theme-input w-full rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20"
-                        placeholder="Masukkan deskripsi singkat atau instruksi penggunaan panduan ini..."
+                        class="p-input resize-none p-3 text-[12px]"
+                        placeholder="Masukkan deskripsi singkat atau instruksi penggunaan dokumen..."
                     >{{ old('deskripsi', $editPanduan->deskripsi ?? '') }}</textarea>
 
-                </div>
+                </section>
 
 
-                {{-- Action --}}
 
-                <div class="pt-4 flex justify-end gap-3 border-t theme-border">
+                {{-- =================================================
+                    ACTION
+                ================================================== --}}
 
-                    <a
-                        href="{{ url('/asesor/kelola_panduan') }}"
-                        class="px-5 py-2.5 border theme-border rounded-lg text-xs font-medium theme-title hover:bg-gray-50 dark:hover:bg-white/5 transition"
-                    >
-                        Batal
-                    </a>
+                <div class="p-divider"></div>
 
 
-                    <button
-                        type="submit"
-                        id="submit-btn"
-                        class="px-5 py-2.5 bg-teal-600 rounded-lg text-xs font-medium text-white hover:bg-teal-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        {{ $bothUploaded ? 'disabled' : '' }}
-                    >
+                <div class="flex flex-col-reverse gap-3 pt-1 sm:flex-row sm:items-center sm:justify-between">
 
-                        <i class="fa-solid fa-{{ $editPanduan ? 'pen-to-square' : 'upload' }} mr-1.5"></i>
+                    <p class="p-muted text-[11px]">
 
-                        {{ $editPanduan ? 'Update Panduan' : 'Simpan Panduan' }}
+                        <i class="fa-solid fa-circle-info mr-1"></i>
 
-                    </button>
+                        Pastikan file sesuai dengan jenis dokumen.
+
+                    </p>
+
+
+                    <div class="flex justify-end gap-2.5">
+
+                        <a
+                            href="{{ url('/asesor/kelola_panduan') }}"
+                            class="p-btn-secondary rounded-lg px-4 py-2.5 text-[12px] font-semibold"
+                        >
+                            Batal
+                        </a>
+
+
+                        <button
+                            type="submit"
+                            id="submit-btn"
+                            class="p-btn-primary rounded-lg px-5 py-2.5 text-[12px] font-semibold shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
+                            {{ $bothUploaded ? 'disabled' : '' }}
+                        >
+
+                            <i class="fa-solid fa-{{ $editPanduan ? 'pen-to-square' : 'upload' }} mr-1.5"></i>
+
+                            {{ $editPanduan ? 'Update Dokumen' : 'Simpan Dokumen' }}
+
+                        </button>
+
+                    </div>
 
                 </div>
 
             </form>
 
-            {{-- Hidden Delete Forms untuk Semua File yang Ada --}}
+
+
+            {{-- DELETE FORMS --}}
+
             @if(isset($existingFiles))
+
                 @foreach($existingFiles as $itemFile)
+
                     <form
                         id="delete-file-form-{{ $itemFile->id_panduan }}"
                         action="{{ route('asesor.panduan.destroy', ['id' => $itemFile->id_panduan]) }}"
                         method="POST"
                         class="hidden"
                     >
+
                         @csrf
+
                         @method('DELETE')
+
                     </form>
+
                 @endforeach
+
             @endif
 
         </div>
 
 
-        {{-- ============================================= --}}
-        {{-- SIDEBAR DAFTAR PANDUAN --}}
-        {{-- ============================================= --}}
 
-        <div class="theme-card border theme-border rounded-2xl p-5 shadow-sm h-fit">
+        {{-- =====================================================
+            SIDEBAR
+        ====================================================== --}}
 
-            <div class="flex items-center justify-between mb-4">
+        <div class="p-main-card p-5 xl:sticky xl:top-5">
 
-                <div>
+            <div class="mb-4 flex items-start justify-between gap-3">
 
-                    <h3 class="font-bold theme-title text-sm">
-                        Panduan & Template Indikator Ini
-                    </h3>
+                <div class="flex items-center gap-2.5">
 
-                    <p class="text-[11px] theme-muted mt-0.5">
-                        File yang sudah tersedia untuk indikator ini
-                    </p>
+                    <div class="p-accent-bg flex h-8 w-8 items-center justify-center rounded-lg">
+
+                        <i class="fa-solid fa-folder-open p-accent text-xs"></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <h3 class="p-text text-[14px] font-bold">
+                            Dokumen Tersedia
+                        </h3>
+
+                        <p class="p-muted mt-0.5 text-[11px]">
+                            Untuk indikator ini
+                        </p>
+
+                    </div>
 
                 </div>
 
 
-                <span class="px-2 py-1 rounded-md bg-green-100 text-green-600 text-[10px] font-semibold">
+                <span class="rounded-md bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-600">
 
                     {{ $panduanList->count() }} Aktif
 
@@ -596,27 +1248,29 @@
             </div>
 
 
-            {{-- Search --}}
+
+            {{-- SEARCH --}}
 
             <div class="relative mb-4">
 
-                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs theme-muted"></i>
+                <i class="fa-solid fa-magnifying-glass p-muted absolute left-3 top-3 text-[10px]"></i>
 
                 <input
                     type="text"
                     id="searchPanduan"
-                    placeholder="Cari panduan..."
-                    class="theme-input w-full rounded-lg pl-8 pr-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                    placeholder="Cari dokumen..."
+                    class="panduan-search w-full rounded-lg py-2.5 pl-8 pr-3 text-[11px]"
                 >
 
             </div>
 
 
-            {{-- List --}}
+
+            {{-- LIST --}}
 
             <div
                 id="panduanContainer"
-                class="space-y-3 max-h-[650px] overflow-y-auto pr-1"
+                class="panduan-scroll max-h-[640px] space-y-1 overflow-y-auto pr-1"
             >
 
                 @forelse($panduanList as $panduan)
@@ -628,111 +1282,109 @@
                             'idDataDukung' => $panduan->id_data_dukung,
                             'edit' => $panduan->id_panduan
                         ]) }}"
-                        class="panduan-item block border theme-border rounded-xl p-3.5 transition hover:border-teal-300"
+                        class="panduan-item block rounded-xl p-3.5 transition hover:bg-teal-50/60 dark:hover:bg-teal-950/10"
                         data-search="{{ strtolower($panduan->judul . ' ' . ($panduan->nama_indikator ?? '') . ' ' . $panduan->tipe) }}"
                     >
 
-                        <div class="flex justify-between items-start gap-2 mb-2">
+                        <div class="mb-2 flex items-center justify-between gap-2">
 
-                            <span class="inline-block bg-[#12a89d]/10 text-[#12a89d] dark:bg-[#14b8a6]/20 dark:text-[#14b8a6] text-[10px] font-bold px-2 py-0.5 rounded uppercase">
+                            <span class="inline-flex items-center gap-1 rounded-md bg-teal-50 px-2 py-1 text-[9px] font-bold uppercase text-teal-700">
+
+                                <i class="fa-regular fa-file text-[8px]"></i>
+
                                 {{ $panduan->tipe }}
+
                             </span>
 
 
                             @if($panduan->file_exists)
 
-                                <i class="fa-solid fa-circle-check text-green-500 text-xs"></i>
+                                <i class="fa-solid fa-circle-check text-[10px] text-emerald-500"></i>
 
                             @endif
 
                         </div>
 
 
-                        <h4 class="font-bold text-xs theme-title mb-1">
+
+                        <h4 class="p-text mb-1 text-[12px] font-bold leading-relaxed">
 
                             {{ $panduan->judul }}
 
                         </h4>
 
 
+
                         @if($panduan->nama_indikator)
 
-                            <p class="text-[11px] theme-muted mb-2">
+                            <p class="p-muted mb-2 text-[10px] leading-relaxed">
 
                                 Indikator {{ $panduan->nomor_indikator }}
-                                :
-                                {{ $panduan->nama_indikator }}
+
+                                — {{ $panduan->nama_indikator }}
 
                             </p>
 
                         @endif
 
 
-                        <div class="flex items-center justify-between gap-2">
 
-                            <div class="flex items-center gap-1.5">
+                        @php
 
-                                @php
-                                    $extension = strtolower(
-                                        pathinfo(
-                                            $panduan->file_name ?? '',
-                                            PATHINFO_EXTENSION
-                                        )
-                                    );
-                                @endphp
+                            $extension = strtolower(
+                                pathinfo(
+                                    $panduan->file_name ?? '',
+                                    PATHINFO_EXTENSION
+                                )
+                            );
 
-
-                                <span class="inline-flex items-center gap-1 text-[10px] border theme-border theme-card theme-title px-1.5 py-0.5 rounded">
-
-                                    @if($extension === 'pdf')
-
-                                        <i class="fa-regular fa-file-pdf text-red-500"></i>
-
-                                    @elseif(in_array($extension, ['doc', 'docx']))
-
-                                        <i class="fa-regular fa-file-word text-blue-500"></i>
-
-                                    @elseif(in_array($extension, ['xls', 'xlsx']))
-
-                                        <i class="fa-regular fa-file-excel text-green-500"></i>
-
-                                    @else
-
-                                        <i class="fa-regular fa-file"></i>
-
-                                    @endif
+                        @endphp
 
 
-                                    <span>
-                                        {{ strtoupper($extension ?: 'FILE') }}
-                                    </span>
+                        <span class="inline-flex items-center gap-1 rounded-md bg-white px-2 py-1 text-[9px] shadow-sm dark:bg-white/5">
 
-                                </span>
+                            @if($extension === 'pdf')
 
-                            </div>
+                                <i class="fa-regular fa-file-pdf text-red-500"></i>
 
-                        </div>
+                            @elseif(in_array($extension, ['doc', 'docx']))
+
+                                <i class="fa-regular fa-file-word text-blue-500"></i>
+
+                            @elseif(in_array($extension, ['xls', 'xlsx']))
+
+                                <i class="fa-regular fa-file-excel text-green-500"></i>
+
+                            @else
+
+                                <i class="fa-regular fa-file p-muted"></i>
+
+                            @endif
+
+                            {{ strtoupper($extension ?: 'FILE') }}
+
+                        </span>
 
                     </a>
 
                 @empty
 
-                    <div class="text-center py-10">
+                    <div class="py-12 text-center">
 
-                        <div class="w-12 h-12 rounded-xl bg-gray-100 dark:bg-white/5 theme-muted flex items-center justify-center mx-auto mb-3">
+                        <div class="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 p-muted dark:bg-white/5">
 
-                            <i class="fa-regular fa-folder-open text-lg"></i>
+                            <i class="fa-regular fa-folder-open"></i>
 
                         </div>
 
 
-                        <p class="text-xs font-medium theme-title">
-                            Belum ada panduan atau template
+                        <p class="p-text text-[13px] font-semibold">
+                            Belum ada dokumen
                         </p>
 
 
-                        <p class="text-[11px] theme-muted mt-1">
-                            File untuk indikator ini akan muncul di sini.
+                        <p class="p-muted mt-1 text-[11px] leading-relaxed">
+                            Panduan atau template untuk indikator ini akan muncul di sini.
                         </p>
 
                     </div>
@@ -748,101 +1400,203 @@
 </div>
 
 
-{{-- ===================================================== --}}
-{{-- JAVASCRIPT --}}
-{{-- ===================================================== --}}
 
 <script>
-
 document.addEventListener('DOMContentLoaded', function () {
 
     const fileInput = document.getElementById('file');
     const fileName = document.getElementById('file-name');
     const uploadIcon = document.getElementById('upload-icon');
     const uploadBox = document.getElementById('upload-box');
-    const radioTipas = document.querySelectorAll('.radio-tipe');
-    const isEditMode = @json((bool)$editPanduan);
-    const bothUploaded = @json((bool)$bothUploaded);
 
-    // Fungsi Pengunci Input File
+    const radioTipas = document.querySelectorAll('.panduan-radio');
+
+    const isEditMode = @json((bool) $editPanduan);
+    const bothUploaded = @json((bool) $bothUploaded);
+
+
     function checkFileAvailability() {
-        if (bothUploaded) {
-            fileInput.disabled = true;
+
+        if (!fileInput) {
             return;
         }
 
-        const selectedRadio = document.querySelector('.radio-tipe:checked');
-        
-        if (!selectedRadio && !isEditMode) {
+
+        if (bothUploaded) {
+
             fileInput.disabled = true;
-            uploadBox.classList.add('opacity-60', 'cursor-not-allowed', 'bg-gray-50/50', 'dark:bg-gray-800/30');
-            uploadBox.classList.remove('cursor-pointer', 'hover:border-teal-500');
-            if(!fileInput.files.length) {
-                fileName.textContent = 'Pilih jenis dokumen terlebih dahulu';
-            }
-        } else {
-            fileInput.disabled = false;
-            uploadBox.classList.remove('opacity-60', 'cursor-not-allowed', 'bg-gray-50/50', 'dark:bg-gray-800/30');
-            uploadBox.classList.add('cursor-pointer', 'hover:border-teal-500');
-            if(!fileInput.files.length) {
-                fileName.textContent = 'Klik untuk unggah atau seret file ke sini';
-            }
+
+            return;
         }
+
+
+        const selectedRadio =
+            document.querySelector('.panduan-radio:checked');
+
+
+        if (!selectedRadio && !isEditMode) {
+
+            fileInput.disabled = true;
+
+            uploadBox.classList.add(
+                'cursor-not-allowed',
+                'opacity-50'
+            );
+
+
+            if (!fileInput.files.length) {
+
+                fileName.textContent =
+                    'Pilih jenis dokumen terlebih dahulu';
+
+            }
+
+        } else {
+
+            fileInput.disabled = false;
+
+            uploadBox.classList.remove(
+                'cursor-not-allowed',
+                'opacity-50'
+            );
+
+
+            if (!fileInput.files.length) {
+
+                fileName.textContent =
+                    isEditMode
+                        ? 'Klik untuk mengganti file'
+                        : 'Klik untuk upload file';
+
+            }
+
+        }
+
     }
 
-    // Panggil saat halaman pertama dimuat
+
     checkFileAvailability();
 
-    // Event saat Radio Jenis Dokumen dipilih
-    radioTipas.forEach(radio => {
-        radio.addEventListener('change', checkFileAvailability);
-    });
 
-    // Event saat File dipilih
-    fileInput.addEventListener('change', function () {
 
-        if (!this.files.length) {
+    radioTipas.forEach(function (radio) {
+
+        radio.addEventListener('change', function () {
+
             checkFileAvailability();
-            return;
-        }
 
-        const file = this.files[0];
-        fileName.textContent = file.name;
 
-        const extension = file.name.split('.').pop().toLowerCase();
+            if (this.value === 'PANDUAN') {
 
-        if (extension === 'pdf') {
-            uploadIcon.innerHTML = '<i class="fa-regular fa-file-pdf text-lg"></i>';
-        } else if (['doc', 'docx'].includes(extension)) {
-            uploadIcon.innerHTML = '<i class="fa-regular fa-file-word text-lg"></i>';
-        } else if (['xls', 'xlsx'].includes(extension)) {
-            uploadIcon.innerHTML = '<i class="fa-regular fa-file-excel text-lg"></i>';
-        } else {
-            uploadIcon.innerHTML = '<i class="fa-regular fa-file text-lg"></i>';
-        }
+                uploadIcon.innerHTML =
+                    '<i class="fa-regular fa-file-pdf text-lg text-red-500"></i>';
+
+            }
+
+
+            if (this.value === 'TEMPLATE') {
+
+                uploadIcon.innerHTML =
+                    '<i class="fa-regular fa-file-word text-lg text-blue-500"></i>';
+
+            }
+
+        });
+
     });
 
 
-    // =====================================================
-    // SEARCH PANDUAN
-    // =====================================================
 
-    const searchInput = document.getElementById('searchPanduan');
-    const panduanItems = document.querySelectorAll('.panduan-item');
+    if (fileInput) {
+
+        fileInput.addEventListener('change', function () {
+
+            if (!this.files.length) {
+
+                checkFileAvailability();
+
+                return;
+
+            }
+
+
+            const file = this.files[0];
+
+            fileName.textContent = file.name;
+
+
+            const extension =
+                file.name
+                    .split('.')
+                    .pop()
+                    .toLowerCase();
+
+
+            if (extension === 'pdf') {
+
+                uploadIcon.innerHTML =
+                    '<i class="fa-regular fa-file-pdf text-lg text-red-500"></i>';
+
+            } else if (
+                ['doc', 'docx'].includes(extension)
+            ) {
+
+                uploadIcon.innerHTML =
+                    '<i class="fa-regular fa-file-word text-lg text-blue-500"></i>';
+
+            } else if (
+                ['xls', 'xlsx'].includes(extension)
+            ) {
+
+                uploadIcon.innerHTML =
+                    '<i class="fa-regular fa-file-excel text-lg text-green-500"></i>';
+
+            } else {
+
+                uploadIcon.innerHTML =
+                    '<i class="fa-regular fa-file text-lg p-muted"></i>';
+
+            }
+
+        });
+
+    }
+
+
+
+    const searchInput =
+        document.getElementById('searchPanduan');
+
+    const panduanItems =
+        document.querySelectorAll('.panduan-item');
+
 
     if (searchInput) {
+
         searchInput.addEventListener('input', function () {
-            const keyword = this.value.toLowerCase().trim();
+
+            const keyword =
+                this.value.toLowerCase().trim();
+
 
             panduanItems.forEach(function (item) {
-                const text = item.dataset.search || '';
-                item.style.display = text.includes(keyword) ? '' : 'none';
+
+                const text =
+                    item.dataset.search || '';
+
+
+                item.style.display =
+                    text.includes(keyword)
+                        ? ''
+                        : 'none';
+
             });
+
         });
+
     }
 
 });
-
 </script>
 
 @endsection

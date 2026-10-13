@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Asesor;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +26,7 @@ class ProfileController extends Controller
                 'u.name',
                 'u.email',
                 'u.created_at',
-                'u.foto_profile',
+                'u.profile_photo_path',
                 'a.nip',
                 'a.jabatan',
                 'a.unit_kerja',
@@ -35,8 +36,9 @@ class ProfileController extends Controller
             ->first();
 
         if ($user) {
-            $user->profile_photo_url = ! empty($user->foto_profile) && file_exists(public_path($user->foto_profile))
-                ? asset($user->foto_profile)
+            $user->profile_photo_url = !empty($user->profile_photo_path)
+                && file_exists(public_path($user->profile_photo_path))
+                ? asset($user->profile_photo_path)
                 : asset('asesor_img/default-profile.svg');
         }
 
@@ -57,7 +59,7 @@ class ProfileController extends Controller
                 'u.id_user',
                 'u.name',
                 'u.email',
-                'u.foto_profile',
+                'u.profile_photo_path',
                 'a.nip',
                 'a.jabatan',
                 'a.unit_kerja',
@@ -66,8 +68,9 @@ class ProfileController extends Controller
             ->first();
 
         if ($user) {
-            $user->profile_photo_url = ! empty($user->foto_profile) && file_exists(public_path($user->foto_profile))
-                ? asset($user->foto_profile)
+            $user->profile_photo_url = !empty($user->profile_photo_path)
+                && file_exists(public_path($user->profile_photo_path))
+                ? asset($user->profile_photo_path)
                 : asset('asesor_img/default-profile.svg');
         }
 
@@ -94,34 +97,95 @@ class ProfileController extends Controller
             'updated_at' => now(),
         ];
 
+        /*
+        |--------------------------------------------------------------------------
+        | UPDATE PASSWORD
+        |--------------------------------------------------------------------------
+        */
         if ($request->filled('password')) {
             $updateUser['password'] = Hash::make($request->password);
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | UPLOAD FOTO PROFIL
+        |--------------------------------------------------------------------------
+        */
         if ($request->hasFile('avatar')) {
-            $currentUser = DB::table('users')->where('id_user', $userId)->first();
 
-            if (! empty($currentUser->foto_profile) && $currentUser->foto_profile !== 'asesor_img/default-profile.svg' && file_exists(public_path($currentUser->foto_profile))) {
-                unlink(public_path($currentUser->foto_profile));
+            $currentUser = DB::table('users')
+                ->where('id_user', $userId)
+                ->first();
+
+            /*
+            | Hapus foto lama jika memang ada
+            */
+            if (
+                !empty($currentUser->profile_photo_path) &&
+                $currentUser->profile_photo_path !== 'asesor_img/default-profile.svg' &&
+                file_exists(public_path($currentUser->profile_photo_path))
+            ) {
+                unlink(public_path($currentUser->profile_photo_path));
             }
 
-            $file = $request->file('avatar');
-            $filename = 'avatar-'.$userId.'-'.time().'.'.$file->getClientOriginalExtension();
+            /*
+            | Folder penyimpanan
+            */
             $directory = 'asesor_img/profile';
             $destination = public_path($directory);
 
-            if (! is_dir($destination)) {
+            if (!is_dir($destination)) {
                 mkdir($destination, 0777, true);
             }
 
+            /*
+            | Nama file
+            */
+            $file = $request->file('avatar');
+
+            $filename = 'avatar-' . $userId . '-' . time() . '.' .
+                $file->getClientOriginalExtension();
+
+            /*
+            | Pindahkan file ke public/asesor_img/profile
+            */
             $file->move($destination, $filename);
-            $updateUser['foto_profile'] = $directory.'/'.$filename;
+
+            /*
+            | Simpan lokasi file ke database
+            */
+            $updateUser['profile_photo_path'] =
+                $directory . '/' . $filename;
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | SIMPAN DATA USER
+        |--------------------------------------------------------------------------
+        */
         DB::table('users')
             ->where('id_user', $userId)
             ->update($updateUser);
 
-        return redirect()->route('asesor.profil')->with('success', 'Profil berhasil diperbarui!');
+        /*
+        |--------------------------------------------------------------------------
+        | AUDIT LOG
+        |--------------------------------------------------------------------------
+        */
+        AuditLog::record(
+            'PERBARUI_PROFIL',
+            'users',
+            $userId,
+            'Asesor memperbarui informasi profil.'
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | REDIRECT
+        |--------------------------------------------------------------------------
+        */
+        return redirect()
+            ->route('asesor.profil')
+            ->with('success', 'Profil berhasil diperbarui!');
     }
 }

@@ -236,28 +236,28 @@
 
 
                     {{-- AKSI --}}
-                    <td class="px-4 py-3 text-center">
+                <td class="px-4 py-3 text-center">
+                    <a href="{{ route('asesor.verifikasi.detail.page', [
+                        'id_instansi' => $tugas->id_instansi,
+                        'no_indikator' => $tugas->nomor_indikator,
+                        'id_data_dukung' => $tugas->id_data_dukung
+                    ]) }}"
+                    class="inline-flex items-center gap-1.5 rounded-xl border border-teal-200 px-3.5 py-2 text-xs font-semibold text-teal-600 transition hover:border-teal-300 hover:bg-teal-50 dark:border-teal-800 dark:hover:bg-teal-900/20">
 
-                        <a href="{{ route('asesor.verifikasi.detail', $tugas->id_dokumen) }}"
-                           class="inline-flex items-center gap-1.5 rounded-xl border border-teal-200 px-3.5 py-2 text-xs font-semibold text-teal-600 transition hover:border-teal-300 hover:bg-teal-50 dark:border-teal-800 dark:hover:bg-teal-900/20">
+                        Review
 
-                            Review
+                        <svg class="h-3.5 w-3.5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 5l7 7-7 7"/>
+                        </svg>
 
-                            <svg class="h-3.5 w-3.5"
-                                 fill="none"
-                                 stroke="currentColor"
-                                 viewBox="0 0 24 24">
-
-                                <path stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      stroke-width="2"
-                                      d="M9 5l7 7-7 7"/>
-
-                            </svg>
-
-                        </a>
-
-                    </td>
+                    </a>
+                </td>
 
                 </tr>
 

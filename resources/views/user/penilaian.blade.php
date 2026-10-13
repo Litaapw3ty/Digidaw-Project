@@ -2,8 +2,7 @@
 
 @section('content')
 
-<div class="w-full max-w-[1250px] mx-auto px-4 sm:px-6 lg:px-8 py-8 text-gray-800 dark:text-gray-100">
-
+<div class="w-full px-4 sm:px-6 lg:px-8 py-8 text-gray-800 dark:text-gray-100">
     {{-- HEADER --}}
     <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-5 mb-8">
 

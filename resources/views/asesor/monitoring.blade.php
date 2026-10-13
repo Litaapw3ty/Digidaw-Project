@@ -21,6 +21,7 @@
 
         {{-- Total Instansi --}}
         <div class="theme-card border theme-border rounded-xl p-5">
+
             <p class="text-sm theme-muted">
                 Total Instansi
             </p>
@@ -28,30 +29,41 @@
             <h2 class="text-3xl font-bold theme-title mt-2">
                 {{ $totalInstansi }}
             </h2>
+
+        </div>
+
+
+        {{-- Proses --}}
+        <div class="theme-card border theme-border rounded-xl p-5">
+
+            <p class="text-sm theme-muted">
+                Proses
+            </p>
+
+            <h2
+                class="text-3xl font-bold mt-2"
+                style="color: #f6c400;"
+            >
+                {{ $proses }}
+            </h2>
+
         </div>
 
 
         {{-- Sudah Dinilai --}}
         <div class="theme-card border theme-border rounded-xl p-5">
+
             <p class="text-sm theme-muted">
                 Sudah Dinilai
             </p>
 
-            <h2 class="text-3xl font-bold mt-2" style="color: #12a89d;">
+            <h2
+                class="text-3xl font-bold mt-2"
+                style="color: #12a89d;"
+            >
                 {{ $sudahDinilai }}
             </h2>
-        </div>
 
-
-        {{-- Belum Dinilai --}}
-        <div class="theme-card border theme-border rounded-xl p-5">
-            <p class="text-sm theme-muted">
-                Belum Dinilai
-            </p>
-
-            <h2 class="text-3xl font-bold mt-2">
-                {{ $belumDinilai }}
-            </h2>
         </div>
 
     </div>
@@ -60,7 +72,9 @@
     {{-- Tabel Monitoring --}}
     <div class="theme-card border theme-border rounded-xl overflow-hidden">
 
+        {{-- Header tabel --}}
         <div class="px-6 py-5 border-b theme-border">
+
             <h2 class="text-lg font-semibold theme-title">
                 Daftar Penilaian Instansi
             </h2>
@@ -68,6 +82,7 @@
             <p class="text-sm theme-muted mt-1">
                 Nilai akhir penilaian masing-masing instansi.
             </p>
+
         </div>
 
 
@@ -77,6 +92,7 @@
 
                 <thead>
                     <tr>
+
                         <th class="text-left px-6 py-4">
                             INSTANSI
                         </th>
@@ -92,6 +108,7 @@
                         <th class="text-center px-6 py-4">
                             AKSI
                         </th>
+
                     </tr>
                 </thead>
 
@@ -104,6 +121,7 @@
 
                             {{-- Instansi --}}
                             <td class="px-6 py-4">
+
                                 <div class="font-medium theme-title">
                                     {{ $item->nama_instansi }}
                                 </div>
@@ -111,10 +129,11 @@
                                 <div class="text-sm theme-muted mt-1">
                                     ID: {{ $item->id_instansi }}
                                 </div>
+
                             </td>
 
 
-                            {{-- Nilai --}}
+                            {{-- Nilai Akhir --}}
                             <td class="px-6 py-4">
 
                                 @if ($item->indeks_akhir !== null)
@@ -137,11 +156,14 @@
                             {{-- Status --}}
                             <td class="px-6 py-4">
 
-                                @if ($item->indeks_akhir !== null)
+                                @if ($item->status_monitoring === 'SELESAI')
 
                                     <span
                                         class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
-                                        style="background-color: rgba(18, 168, 157, 0.12); color: #12a89d;"
+                                        style="
+                                            background-color: rgba(18, 168, 157, 0.12);
+                                            color: #12a89d;
+                                        "
                                     >
                                         Sudah Dinilai
                                     </span>
@@ -150,9 +172,12 @@
 
                                     <span
                                         class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
-                                        style="background-color: rgba(107, 114, 128, 0.12); color: #6b7280;"
+                                        style="
+                                            background-color: rgba(246, 196, 0, 0.12);
+                                            color: #b38b00;
+                                        "
                                     >
-                                        Belum Dinilai
+                                        Proses
                                     </span>
 
                                 @endif
@@ -164,7 +189,7 @@
                             <td class="px-6 py-4 text-center">
 
                                 <a
-                                    href="{{ route('monitoring.detail', $item->id_instansi) }}"
+                                    href="{{ route('asesor.monitoring.detail', $item->id_instansi) }}"
                                     class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-[#12a89d] text-white hover:bg-[#0e877e] transition"
                                 >
                                     Detail
